@@ -3,15 +3,23 @@
 #include "dist.h"
 
 #include <algorithm>
+#include <chrono>
+#include <concepts>
+#include <cstddef>
 #include <cstdint>
 #include <filesystem>
+#include <limits>
 #include <numeric>
 #include <random>
+#include <string>
+#include <utility>
 #include <vector>
 
 #ifdef __linux__
+#include <bits/types/struct_rusage.h>
+#include <cerrno>
 #include <sys/resource.h>
-#include <sys/time.h>
+#include <system_error>
 #endif
 
 class RandomGenerator {

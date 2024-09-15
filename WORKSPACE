@@ -67,16 +67,16 @@ bazel_skylib_workspace()
 
 http_archive(
     name = "catch2",
-    sha256 = "122928b814b75717316c71af69bd2b43387643ba076a6ec16e7882bfb2dfacbb",
-    strip_prefix = "Catch2-3.4.0",
-    urls = ["https://github.com/catchorg/Catch2/archive/refs/tags/v3.4.0.tar.gz"],
+    sha256 = "5b10cd536fa3818112a82820ce0787bd9f2a906c618429e7c4dea639983c8e88",
+    strip_prefix = "Catch2-3.7.0",
+    urls = ["https://github.com/catchorg/Catch2/archive/refs/tags/v3.7.0.tar.gz"],
 )
 
 http_archive(
     name = "hedron_compile_commands",
-    sha256 = "ed5aea1dc87856aa2029cb6940a51511557c5cac3dbbcb05a4abd989862c36b4",
-    strip_prefix = "bazel-compile-commands-extractor-e16062717d9b098c3c2ac95717d2b3e661c50608",
-    url = "https://github.com/hedronvision/bazel-compile-commands-extractor/archive/e16062717d9b098c3c2ac95717d2b3e661c50608.tar.gz",
+    sha256 = "044b148b111e17cee61d8c3aaeed42069f7325460382340afca4919f8265094c",
+    strip_prefix = "bazel-compile-commands-extractor-1e08f8e0507b6b6b1f4416a9a22cf5c28beaba93",
+    url = "https://github.com/hedronvision/bazel-compile-commands-extractor/archive/1e08f8e0507b6b6b1f4416a9a22cf5c28beaba93.tar.gz",
 )
 
 load("@hedron_compile_commands//:workspace_setup.bzl", "hedron_compile_commands_setup")
@@ -87,15 +87,15 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "bazel_clang_tidy",
-    commit = "11541864afa832ff6721e479c44794e9c9497ae8",
+    commit = "e85311053ec3c32ff418b433af4469b9c77e6b16",
     remote = "https://github.com/erenon/bazel_clang_tidy.git",
 )
 
 # load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_repository")
 
-BAZEL_CLANG_FORMAT_COMMIT = "ad5f2572518053b36a2d999f7b824fb5a7819ab4"
+BAZEL_CLANG_FORMAT_COMMIT = "1fd2a042798ede8d6f5498ea92287bc1204260fa"
 
-BAZEL_CLANG_FORMAT_SHA = "c31f0ea477dd0da84fc2c694a533797a9d2bf060f8cca8b5ea30402a47a2ea0a"
+BAZEL_CLANG_FORMAT_SHA = "c1c4bc1ae1ef9f9ec582d30718b56505907ea59e288e4a65a02ce5c14f990c57"
 
 http_archive(
     name = "bazel_clang_format",
@@ -108,11 +108,10 @@ http_archive(
     ),
 )
 
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 git_repository(
     name = "googletest",
     remote = "https://github.com/google/googletest",
-    branch = "v1.15.x",
+    commit = "b514bdc898e2951020cbdca1304b75f5950d1f59"
 )
 
 # http_archive(

@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <limits>
+#include <numbers>
 #include <stdexcept>
 #include <type_traits>
 
