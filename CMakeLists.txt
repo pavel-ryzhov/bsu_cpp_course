@@ -33,8 +33,6 @@ function(add_task name)
   endif()
 endfunction()
 
-add_task(00_test/sum)
-
 add_task(01_first_tasks/bin-pow)
 add_task(01_first_tasks/diff-pairs)
 add_task(01_first_tasks/long-sum)

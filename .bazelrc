@@ -2,25 +2,41 @@ common --enable_bzlmod
 # build --action_env=CC=clang
 # build --action_env=CXX=clang++
 build --disk_cache=~/.cache/shared_bazel_action_cache/
+test --disk_cache=~/.cache/shared_bazel_action_cache/
 test --test_verbose_timeout_warnings
 
-build --cxxopt='-std=c++20'
-test --cxxopt='-std=c++20'
+build --cxxopt='-std=c++2b'
+test --cxxopt='-std=c++2b'
 
 # TODO(sokolik): doesn't work with  assembler
 # build --copt="--language=c++"
 # test --copt="--language=c++"
 
+build --cxxopt="-O3"
+test --cxxopt="-O3"
+
+build --cxxopt='-Wno-pragma-once-outside-header'
+test --cxxopt='-Wno-pragma-once-outside-header'
+
+
 build --copt="-fdiagnostics-color=always"
+test --copt="-fdiagnostics-color=always"
+run --copt="-fdiagnostics-color=always"
 # Use cursor controls in screen output.
 # Docs: https://bazel.build/docs/user-manual#curses
 # build --curses=yes
 # test --curses=yes
 
 # Use colors to highlight output on the screen. Set to `no` if your CI does not display colors.
+
 # Docs: https://bazel.build/docs/user-manual#color
+
 build --color=yes
 test --color=yes
+
+# if you set this curses, you will break all ci print
+# build --curses=yes
+# test --curses=yes
 
 # Promote unused result and variable warnings to errors.
 build --cxxopt='-Werror=unused-result'
@@ -32,8 +48,23 @@ test --cxxopt='-Werror=unused-variable'
 build --cxxopt='-Werror=dangling-else'
 test --cxxopt='-Werror=dangling-else'
 
-test --test_arg=--colour-mode=ansi
+# TODO(sokolik): fix it
+build --copt='-Wno-deprecated-declarations'
+test --copt='-Wno-deprecated-declarations'
+
+# build --test_arg=--colour-mode=ansi
+# test --test_arg=--colour-mode=ansi
+build --test_output=errors
 test --test_output=errors
+
+###############################################################
+# Use `bazel build --config=release` to enable these settings #
+###############################################################
+
+build:release --copt -O3
+build:release --copt -Wall
+build:release --copt -DNDEBUG
+
 
 # Address sanitizer
 ############################################################
@@ -78,9 +109,17 @@ build:msan --strip=never
 build:msan --copt -fsanitize=memory
 build:msan --copt -fsanitize-memory-track-origins=2
 build:msan --copt -DADDRESS_SANITIZER
+# build:msan --copt -DGTEST_USE_OWN_TR1_TUPLE=1
 # build:msan --copt -O1
 build:msan --copt -fno-omit-frame-pointer
 build:msan --linkopt -fsanitize=memory
+build:msan --action_env=clang-18
+build:msan --action_env=clang++-18
+# build:msan --action_env=PATH
+build:msan --action_env=CXXFLAGS=-stdlib=libc++
+build:msan --action_env=BAZEL_CXXOPTS=-stdlib=libc++
+build:msan --action_env=BAZEL_LINKLIBS=-lc++:-lc++abi:-lm
+build:msan --host_linkopt=-fuse-ld=lld
 
 # Undefined Behavior Sanitizer
 #############################################################
@@ -126,6 +165,25 @@ test:debug --test_timeout=9999
 # Always run tests even if they have cached results.
 # Docs: https://bazel.build/docs/user-manual#cache-test-results
 test:debug --nocache_test_results
+
+build:debug --copt -O2
+test:debug --copt -O2
+# build:debug --copt -Wall
+
+build:debug --copt -g
+test:debug --copt -g
+
+build:debug -c dbg
+test:debug -c dbg
+
+build:debug --copt -DNDEBUG
+test:debug --copt -DNDEBUG
+
+build:debug --strip=never
+test:debug --strip=never
+
+build:debug --cxxopt='-Wno-error=unused-variable'
+test:debug --cxxopt='-Wno-error=unused-variable'
 
 # Clang-tidy
 ##################################################################

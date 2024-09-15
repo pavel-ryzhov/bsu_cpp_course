@@ -171,14 +171,14 @@ def main(all_info: bool) -> None:
     """
     print_version('python3', (3, 11, 0), 'python3.11', how_to_fix_default, '')
 
-    clang_version = (17, 0, 0)
+    clang_version = (18, 0, 0)
     how_to_install_clang = """
     wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh {} all
     """.format(clang_version[0])
-    print_version('clang', clang_version, how_to_install_clang, 'clang-17', how_to_fix_default)
-    print_version('clang++', clang_version, how_to_install_clang, 'clang++-17', how_to_fix_default)
-    print_version('clang-format', clang_version, how_to_install_clang, 'clang-format-17', how_to_fix_default)
-    print_version('clang-tidy', clang_version, how_to_install_clang, 'clang-tidy-17', how_to_fix_default)
+    print_version('clang', clang_version, how_to_install_clang, 'clang-18', how_to_fix_default)
+    print_version('clang++', clang_version, how_to_install_clang, 'clang++-18', how_to_fix_default)
+    print_version('clang-format', clang_version, how_to_install_clang, 'clang-format-18', how_to_fix_default)
+    print_version('clang-tidy', clang_version, how_to_install_clang, 'clang-tidy-18', how_to_fix_default)
 
     gcc_version = (13, 0, 0)
     how_to_install_gcc = """

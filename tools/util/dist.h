@@ -131,7 +131,7 @@ class UniformRealDistribution {
         constexpr auto kBits = std::numeric_limits<RealType>::digits;
         constexpr auto kR =
             static_cast<long double>(Gen::max()) - static_cast<long double>(Gen::min()) + 1.L;
-        const size_t log2r = std::log(kR) / std::log(2.L);
+        const size_t log2r = std::log(kR) / std::numbers::ln2_v<long double>;
         const size_t m = std::max<size_t>(1UL, (kBits + log2r - 1UL) / log2r);
         RealType sum{0};
         RealType tmp{1};

@@ -108,25 +108,70 @@ http_archive(
     ),
 )
 
-http_archive(
-    name = "rules_qt",
-    sha256 = BAZEL_CLANG_FORMAT_SHA,
-    url = "https://github.com/oliverlee/bazel_clang_format/archive/{commit}.tar.gz".format(
-        commit = BAZEL_CLANG_FORMAT_COMMIT,
-    ),
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+git_repository(
+    name = "googletest",
+    remote = "https://github.com/google/googletest",
+    branch = "v1.15.x",
 )
 
-http_archive(
-    name = "rules_qt",
-    sha256 = "bd8253247c0e45e6a180c87083f20910159e36cd67f6b11d5d3d865a61ea52cd",
-    strip_prefix = "rules_qt6-0.0.3",
-    url = "https://github.com/Vertexwahn/rules_qt6/releases/download/v0.0.3/rules_qt6-v0.0.3.tar.gz",
-)
+# http_archive(
+#     name = "rules_qt",
+#     sha256 = BAZEL_CLANG_FORMAT_SHA,
+#     url = "https://github.com/oliverlee/bazel_clang_format/archive/{commit}.tar.gz".format(
+#         commit = BAZEL_CLANG_FORMAT_COMMIT,
+#     ),
+# )
 
-load("@rules_qt//:fetch_qt.bzl", "fetch_qt6")
+# http_archive(
+#     name = "rules_qt",
+#     sha256 = "bd8253247c0e45e6a180c87083f20910159e36cd67f6b11d5d3d865a61ea52cd",
+#     strip_prefix = "rules_qt6-0.0.3",
+#     url = "https://github.com/Vertexwahn/rules_qt6/releases/download/v0.0.3/rules_qt6-v0.0.3.tar.gz",
+# )
 
-fetch_qt6()
+# load("@rules_qt//:fetch_qt.bzl", "fetch_qt6")
 
-load("@rules_qt//tools:qt_toolchain.bzl", "register_qt_toolchains")
+# fetch_qt6()
 
-register_qt_toolchains()
+# load("@rules_qt//tools:qt_toolchain.bzl", "register_qt_toolchains")
+
+# register_qt_toolchains()
+
+
+# # # http_archive(
+# # #     name = "bazelci_rules",
+# # #     sha256 = "eca21884e6f66a88c358e580fd67a6b148d30ab57b1680f62a96c00f9bc6a07e",
+# # #     strip_prefix = "bazelci_rules-1.0.0",
+# # #     url = "https://github.com/bazelbuild/continuous-integration/releases/download/rules-1.0.0/bazelci_rules-1.0.0.tar.gz",
+# # # )
+
+# # BAZEL_CLANG_FORMAT_COMMIT = "ad5f2572518053b36a2d999f7b824fb5a7819ab4"
+
+# # BAZEL_CLANG_FORMAT_SHA = "c31f0ea477dd0da84fc2c694a533797a9d2bf060f8cca8b5ea30402a47a2ea0a"
+
+# # http_archive(
+# #     name = "bazel_clang_format",
+# #     sha256 = BAZEL_CLANG_FORMAT_SHA,
+# #     strip_prefix = "bazel_clang_format-{commit}".format(
+# #         commit = BAZEL_CLANG_FORMAT_COMMIT,
+# #     ),
+# #     url = "https://github.com/oliverlee/bazel_clang_format/archive/{commit}.tar.gz".format(
+# #         commit = BAZEL_CLANG_FORMAT_COMMIT,
+# #     ),
+# # )
+
+# # http_archive(
+# #     name = "ranges",
+# #     integrity = "sha256-AVrbIwCpjt/OrwclvuwzN/VCr0kVzsTQuJ+giG9Lqcs=",
+# #     strip_prefix = "range-v3-0.12.0",
+# #     url = "https://github.com/ericniebler/range-v3/archive/refs/tags/0.12.0.tar.gz",
+# # )
+
+# # http_archive(
+# #     name = "magic_enum",
+# #     integrity = "sha256-Yln+Zimm2GUIGtKRGlvOi2h/jQhq4EVg4tfOOIPp6o0=",
+# #     strip_prefix = "magic_enum-0.9.5",
+# #     url = "https://github.com/Neargye/magic_enum/archive/refs/tags/v0.9.5.zip",
+# # )
+

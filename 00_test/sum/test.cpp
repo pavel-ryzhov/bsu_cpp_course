@@ -1,6 +1,7 @@
+#include "sum.h"
+
 #include <cstdint>
 #include <gtest/gtest.h>
-#include <sum.h>
 #include <type_traits>
 
 TEST(Public, Simple) {
