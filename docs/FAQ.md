@@ -60,24 +60,24 @@ git push origin main
 ```shell
 # Эта проверка вашей стандартной версии clang-tidy
 clang-tidy --version
-# Эта проверка установлен ли clang-tidy-17
-clang-tidy-17 --version
+# Эта проверка установлен ли clang-tidy-18
+clang-tidy-18 --version
 ```
 
-* Для установки в консоль введите следующие команды, чтобы установить актуальную (17) версию
+* Для установки в консоль введите следующие команды, чтобы установить актуальную (18) версию
     ```clang-tidy``` и ```clang-format```.
 
     ```shell
     wget https://apt.llvm.org/llvm.sh
     chmod +x llvm.sh
-    sudo ./llvm.sh 17 all
+    sudo ./llvm.sh 18 all
     ```
 
-* Когда у вас установлен ```clang-tidy-17```, но используется стандартный другой версии ```clang-tidy```.
+* Когда у вас установлен ```clang-tidy-18```, но используется стандартный другой версии ```clang-tidy```.
 
     ```shell
-    sudo rm -rf /usr/bin/clang-format && sudo ln -s /usr/bin/clang-format-17 /usr/bin/clang-format && clang-format --version
-    sudo rm -rf /usr/bin/clang-tidy && sudo ln -s /usr/bin/clang-tidy-17 /usr/bin/clang-tidy && clang-tidy --version
+    sudo rm -rf /usr/bin/clang-format && sudo ln -s /usr/bin/clang-format-18 /usr/bin/clang-format && clang-format --version
+    sudo rm -rf /usr/bin/clang-tidy && sudo ln -s /usr/bin/clang-tidy-18 /usr/bin/clang-tidy && clang-tidy --version
     ```
 
 </details>
@@ -120,7 +120,7 @@ CLion. Из-за особенностей реализации плагина Cl
 
 По умолчанию на macOS нет `clang`.
 
-В рамках данного курса необходимо использование `LLVM Clang 17.0.0` и выше. Для установки LLVM Clang необходимо сделать следующее:
+В рамках данного курса необходимо использование `LLVM Clang 18.0.0` и выше. Для установки LLVM Clang необходимо сделать следующее:
 
 ```bash
 brew install llvm
@@ -138,7 +138,7 @@ Clang и Clang++ будут находится по следующим путя�
 Проверьте, что у Вас установлен Homebrew clang с помощью команды clang --version. Пример вывода:
 
 ```bash
-Homebrew clang version 17.0.1
+Homebrew clang version 18.0.1
 Target: arm64-apple-darwin23.0.0
 Thread model: posix
 InstalledDir: /opt/homebrew/opt/llvm/bin
