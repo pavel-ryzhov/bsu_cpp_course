@@ -39,8 +39,9 @@
 
 ## Настройка системы <a id='pre'/>
 
-В инструкции все команды, которые нужно вводить начинаются с знака `$` вам нужно копировать и исполнять всё после него.
-`#` - обозначается комментарий, который только для информации.
+В инструкции все команды, которые нужно вводить начинаются с знака
+**ВАЖНО!** `$` вам нужно копировать и исполнять всё после него.
+**ВАЖНО!** `#` - обозначается комментарий, который только для информации.
 
 Для решения задач вам потребуется компьютер с Unix окружением. Лучше всего использовать Linux.
 OSX тоже будет нормально работать.
@@ -151,7 +152,6 @@ brew install git
   ```bash
   # Создаем ключ:
   ssh-keygen -t ed25519 -f ~/.ssh/manytask_ed25519
-  # TODO(sokolik): ssh-keygen -N "" -f ~/.ssh/id_rsa
   # Обратите внимание, что вы можете не указывать пароль для ключа,
   # чтобы не приходилось его потом вводить на каждое действие c ключом
   # Это стандартная практика, хотя и не очень безопасная
@@ -168,7 +168,7 @@ brew install git
 
 - Идете на [gitlab.manytask.org](https://gitlab.manytask.org/)
 
-- Жмете на иконку с вашим профилем в правом верхнем углу -> `Settings` -> слева жмете на `SSH keys`
+- Жмете на иконку с вашим профилем в правом верхнем углу -> `Settings` или `Preferences` или `Настройки` -> слева жмете на `SSH keys`
 
 - Вставляете ключ в формочку, жмете "Add key"
 
@@ -263,7 +263,6 @@ Linux:
 
 MacOs:
 
-
 - **g++-13, clang++-18 (and clang-tidy, clang-format)**
 
   ```bash
@@ -294,7 +293,26 @@ MacOs:
       - Настройка описана в [инструкции](https://docs.google.com/document/d/1K0t05Bmqb3he3gW4ORQXfkVfFouS4FRT)
       - См. также [Гайд по настройке VSCode + WSL + CMake](docs/WSL.md)
 
-Мы рекомендуем вам воспользоваться [Clion](https://www.jetbrains.com/clion/).
+Мы рекомендуем вам воспользоваться
+<details><summary><a>VSCode</a></summary>
+ [VSCode](https://code.visualstudio.com/)
+
+Рекомендованные расширения:
+
+- Name: clangd
+  VS Marketplace Link: <https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd>
+- Name: Bazel
+  VS Marketplace Link: <https://marketplace.visualstudio.com/items?itemName=BazelBuild.vscode-bazel>
+- Name: C/C++ Themes
+  VS Marketplace Link: <https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-themes>
+
+# TODO(sokolik): add more extensions
+
+</details>
+
+<details><summary><a>Clion</a></summary>
+
+ [Clion](https://www.jetbrains.com/clion/)
 Скачайте бесплатную Community-версию, установите и запустите.
 Проверьте, возможно ваше учебное заведение (т.ч. ШАД) предоставляет учебную лицензию на продукты
 JetBrains. Тогда вы можете установить Professional версию бесплатно.
@@ -302,6 +320,9 @@ JetBrains. Тогда вы можете установить Professional вер
 - Создайте новый проект (Create new project)
 - Укажите путь до репозитория с задачами (см. пункт "Клонирование и настройка репозитория")
 - TODO(sokolik): ...
+
+</details>
+
 
 ### Сдача заданий <a id='send'/>
 

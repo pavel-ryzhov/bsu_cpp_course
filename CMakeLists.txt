@@ -11,8 +11,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS  ON)
 find_package(Catch REQUIRED)
 find_package(Clang REQUIRED)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${LLVM_CMAKE_DIR}")
-# set(Clang_DIR "/usr/lib/llvm-17/lib/cmake/clang")
-# set(LLVM_DIR "/usr/lib/llvm-17/lib/cmake/llvm")
 include(AddLLVM)
 
 include_directories(${LLVM_INCLUDE_DIRS})
