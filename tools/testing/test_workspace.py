@@ -29,7 +29,7 @@ except ImportError:
 try:
     import click
 except ImportError:
-    print(colored("Install termcolor:", 'red'))
+    print(colored("Install click:", 'red'))
     print(colored("!!!!!!! pip3 install click", 'red'))
     print()
 
@@ -169,7 +169,7 @@ def main(all_info: bool) -> None:
     how_to_fix_default = """
     sudo rm -rf /usr/bin/{0} && sudo ln -s /usr/bin/{1} /usr/bin/{0} && {0} --version
     """
-    print_version('python3', (3, 11, 0), 'python3.11', how_to_fix_default, '')
+    print_version('python3', (3, 10, 0), '', 'python3.11', how_to_fix_default)
 
     clang_version = (18, 0, 0)
     how_to_install_clang = """
