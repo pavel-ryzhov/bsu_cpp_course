@@ -244,23 +244,42 @@ Linux:
   sudo apt-get install g++-13
   ```
 
-- **clang++-17 (and  clang-tidy, clang-format)**
+- **clang++-18 (and  clang-tidy, clang-format)**
 
   ```bash
   wget https://apt.llvm.org/llvm.sh
   chmod +x llvm.sh
-  sudo ./llvm.sh 17 all
+  sudo ./llvm.sh 18 all
+  ```
+
+- **bazel**
+  ```bash
+  sudo apt install apt-transport-https curl gnupg
+  curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor >bazel-archive-keyring.gpg
+  sudo mv bazel-archive-keyring.gpg /usr/share/keyrings
+  echo "deb [arch=amd64 signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
+  sudo apt update && sudo apt install bazel
   ```
 
 MacOs:
 
-```bash
-brew install gcc@13 llvm git bazel clang-format
 
-# https://stackoverflow.com/a/53380855
-ln -s "$(brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
-ln -s "$(brew --prefix llvm)/bin/clang-apply-replacements" "/usr/local/bin/clang-apply-replacements"
-```
+- **g++-13, clang++-18 (and clang-tidy, clang-format)**
+
+  ```bash
+  brew install gcc@13 llvm git bazel clang-format
+
+  # https://stackoverflow.com/a/53380855
+  ln -s "$(brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
+  ln -s "$(brew --prefix llvm)/bin/clang-apply-replacements" "/usr/local/bin/clang-apply-replacements"
+  ```
+
+- **bazel**
+
+  ```bash
+  brew install bazel
+  ```
+
 [Asan работать скорее всего не будет](https://github.com/google/sanitizers/issues/1026). Вы можете отключить проверку на утечки в файле `.bazelrc` строчку с `...ASAN_OPTIONS=detect_leaks=1:dete...` на `...ASAN_OPTIONS=detect_leaks=0:dete...`. Тогда в режиме asan проверится некоторое подмножество ошибок.
 Поэтому сборка с ним и строчка скрипта *run_linter.sh*  вида `bazel run...` работать не будут (можно удалить её вместе с обрамляющим if-ом).
 
