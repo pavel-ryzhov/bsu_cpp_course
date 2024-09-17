@@ -7,6 +7,8 @@ try:
 except ImportError:
     print("Install termcolor:")
     print("!!!!!!! pip3 install termcolor")
+    print("!!!!!!! or")
+    print("!!!!!!! sudo apt install python3-termcolor")
     print()
 
     def colored(
