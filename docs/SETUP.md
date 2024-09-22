@@ -290,7 +290,7 @@ MacOs:
       - Настройку можно посмотреть в [записи семинара](https://disk.yandex.ru/i/8waWBV-L-FOKOw)
    - VS Code
       - \[Windows\] [Настройка WSL](https://code.visualstudio.com/docs/cpp/config-wsl)
-      - Настройка описана в [инструкции](https://docs.google.com/document/d/1K0t05Bmqb3he3gW4ORQXfkVfFouS4FRT)
+      - Настройка частично описаны в УСТАРЕВШЕЙ [инструкции](https://docs.google.com/document/d/1K0t05Bmqb3he3gW4ORQXfkVfFouS4FRT)
       - См. также [Гайд по настройке VSCode + WSL + CMake](docs/WSL.md)
 
 Мы рекомендуем вам воспользоваться
