@@ -1,4 +1,4 @@
-# common --enable_bzlmod
+common --enable_bzlmod
 # build --action_env=CC=clang
 # build --action_env=CXX=clang++
 build --disk_cache=~/.cache/shared_bazel_action_cache/
