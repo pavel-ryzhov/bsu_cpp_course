@@ -1,8 +1,8 @@
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <string>
-#include <algorithm>
 
 inline std::string LongSum(const std::string& a, const std::string& b) {
     std::string result;
