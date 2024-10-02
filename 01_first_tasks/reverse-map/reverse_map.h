@@ -1,10 +1,14 @@
 #pragma once
 
-#include <stdexcept>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 inline std::unordered_map<int, std::string> ReverseMap(
     const std::unordered_map<std::string, int>& map) {
-    throw std::runtime_error("Not implemented");
+    std::unordered_map<int, std::string> result;
+    for (const std::pair<std::string, int> e : map) {
+        result[e.second] = e.first;
+    }
+    return result;
 }
