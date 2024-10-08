@@ -31,13 +31,6 @@ function(add_task name)
   endif()
 endfunction()
 
-add_task(02_basic_types/arithmetic-mean)
-add_task(02_basic_types/collatz-conjecture)
-add_task(02_basic_types/credit-card)
-add_task(02_basic_types/fractal)
-add_task(02_basic_types/polish-notation)
-add_task(02_basic_types/split)
-
 add_task(03_continues_functions/common-elements)
 add_task(03_continues_functions/cyclic-shift)
 add_task(03_continues_functions/filter-array)
