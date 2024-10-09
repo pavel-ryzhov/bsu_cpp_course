@@ -11,6 +11,7 @@ cc_test(
     srcs = ["test_bin_pow.cpp"],
     deps = [
         ":bin_pow",
-        "//tools/bazel:catch2",
+        "@catch2//:catch2_main",
+        "@catch2//:catch2",
     ],
 )

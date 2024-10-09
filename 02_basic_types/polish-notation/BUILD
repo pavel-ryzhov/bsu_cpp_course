@@ -11,6 +11,7 @@ cc_test(
     srcs = ["test_polish_notation.cpp"],
     deps = [
         ":polish_notation",
-        "//tools/bazel:catch2",
+        "@catch2//:catch2_main",
+        "@catch2//:catch2",
     ],
 )

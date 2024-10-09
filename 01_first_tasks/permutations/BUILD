@@ -11,6 +11,7 @@ cc_test(
     srcs = ["test_permutations.cpp"],
     deps = [
         ":permutations",
-        "//tools/bazel:catch2",
+        "@catch2//:catch2_main",
+        "@catch2//:catch2",
     ],
 )

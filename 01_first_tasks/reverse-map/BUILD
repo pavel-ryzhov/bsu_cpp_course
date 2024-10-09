@@ -11,6 +11,7 @@ cc_test(
     srcs = ["test_reverse_map.cpp"],
     deps = [
         ":reverse_map",
-        "//tools/bazel:catch2",
+        "@catch2//:catch2_main",
+        "@catch2//:catch2",
     ],
 )

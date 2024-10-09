@@ -12,7 +12,8 @@ cc_test(
     srcs = ["test_accurate_sum.cpp"],
     deps = [
         ":accurate_sum",
-        "//tools/bazel:catch2",
+        "@catch2//:catch2_main",
+        "@catch2//:catch2",
     ],
 )
 
@@ -22,6 +23,7 @@ cc_test_if_exists(
     srcs = [".accurate_sum_test.cpp"],
     deps = [
         ":accurate_sum",
-        "//tools/bazel:catch2",
+        "@catch2//:catch2_main",
+        "@catch2//:catch2",
     ],
 )

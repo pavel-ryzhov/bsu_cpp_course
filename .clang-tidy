@@ -14,6 +14,7 @@ Checks: >
   clang-analyzer-*,
   -clang-analyzer-cplusplus.NewDelete,
   -clang-analyzer-cplusplus.NewDeleteLeaks,
+  -clang-analyzer-optin.core.EnumCastOutOfRange,
   concurrency-*,
   cppcoreguidelines-*,
   -cppcoreguidelines-avoid-magic-numbers,

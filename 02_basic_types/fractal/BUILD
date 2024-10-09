@@ -14,6 +14,7 @@ cc_test(
     srcs = ["test_fractal.cpp"],
     deps = [
         ":fractal",
-        "//tools/bazel:catch2",
+        "@catch2//:catch2_main",
+        "@catch2//:catch2",
     ],
 )

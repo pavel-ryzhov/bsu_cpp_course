@@ -12,7 +12,8 @@ cc_test(
     srcs = ["test_long_sum.cpp"],
     deps = [
         ":long_sum",
-        "//tools/bazel:catch2",
+        "@catch2//:catch2_main",
+        "@catch2//:catch2",
     ],
 )
 
@@ -22,7 +23,7 @@ cc_test_if_exists(
     srcs = [".private_test.cpp"],
     deps = [
         ":long_sum",
-        "//tools/bazel:catch2",
-        "//tools/util",
+        "@catch2//:catch2_main",
+        "@catch2//:catch2",
     ],
 )
