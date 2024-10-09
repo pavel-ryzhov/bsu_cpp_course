@@ -11,6 +11,7 @@ cc_test(
     srcs = ["test_collatz_conjecture.cpp"],
     deps = [
         ":collatz_conjecture",
-        "//tools/bazel:catch2",
+        "@catch2//:catch2_main",
+        "@catch2//:catch2",
     ],
 )

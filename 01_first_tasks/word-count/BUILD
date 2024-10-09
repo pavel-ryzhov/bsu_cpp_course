@@ -11,6 +11,7 @@ cc_test(
     srcs = ["test_word_count.cpp"],
     deps = [
         ":word_count",
-        "//tools/bazel:catch2",
+        "@catch2//:catch2_main",
+        "@catch2//:catch2",
     ],
 )

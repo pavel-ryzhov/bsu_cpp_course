@@ -12,7 +12,8 @@ cc_test(
     srcs = ["test_arithmetic_mean.cpp"],
     deps = [
         ":arithmetic_mean",
-        "//tools/bazel:catch2",
+        "@catch2//:catch2_main",
+        "@catch2//:catch2",
     ],
 )
 
@@ -22,7 +23,7 @@ cc_test_if_exists(
     srcs = [".private_test.cpp"],
     deps = [
         ":arithmetic_mean",
-        "//tools/bazel:catch2",
-        "//tools/util",
+        "@catch2//:catch2_main",
+        "@catch2//:catch2",
     ],
 )

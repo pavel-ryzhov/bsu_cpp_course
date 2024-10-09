@@ -12,7 +12,8 @@ cc_test(
     srcs = ["test.cpp"],
     deps = [
         ":lib",
-        "//tools/bazel:catch2",
+        "@catch2//:catch2_main",
+        "@catch2//:catch2",
     ],
 )
 
@@ -22,6 +23,7 @@ cc_test_if_exists(
     srcs = [".private_test.cpp"],
     deps = [
         ":lib",
-        "//tools/bazel:catch2",
+        "@catch2//:catch2_main",
+        "@catch2//:catch2",
     ],
 )

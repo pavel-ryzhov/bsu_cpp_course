@@ -53,11 +53,11 @@ bazel_dep(name = "spdlog", version = "1.14.1")
 bazel_dep(name = "magic_enum", version = "0.9.6")
 
 # Tests frameworks
-bazel_dep(name = "catch2", version = "3.6.0")
+bazel_dep(name = "catch2", version = "3.7.1")
 bazel_dep(name = "googletest", version = "1.15.2")
 
 # benchmark
-bazel_dep(name = "google_benchmark", version = "1.8.3")
+bazel_dep(name = "google_benchmark", version = "1.8.5")
 
 # compile_comands.json generator
 # Hedron's Compile Commands Extractor for Bazel
@@ -65,8 +65,7 @@ bazel_dep(name = "google_benchmark", version = "1.8.3")
 bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
 git_override(
     module_name = "hedron_compile_commands",
-    commit = "1e08f8e0507b6b6b1f4416a9a22cf5c28beaba93",
-    # commit = "a14ad3a64e7bf398ab48105aaa0348e032ac87f8",
+    commit = "4f28899228fb3ad0126897876f147ca15026151e",
     remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
 )
 
@@ -77,14 +76,14 @@ git_override(
 
 # bazel linter
 bazel_dep(name = "buildozer", version = "7.1.2")
-bazel_dep(name = "depend_on_what_you_use", version = "0.2.0")
+bazel_dep(name = "depend_on_what_you_use", version = "0.5.0")
 
 # linters
 
 bazel_dep(name = "bazel_clang_tidy", dev_dependency = True)
 git_override(
     module_name = "bazel_clang_tidy",
-    commit = "e85311053ec3c32ff418b433af4469b9c77e6b16",
+    commit = "c4c4b9ce5693b26ec6b8e7b0af3db59a3092d540",
     remote = "https://github.com/erenon/bazel_clang_tidy.git",
 )
 

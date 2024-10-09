@@ -11,6 +11,7 @@ cc_test(
     srcs = ["test_split.cpp"],
     deps = [
         ":split",
-        "//tools/bazel:catch2",
+        "@catch2//:catch2_main",
+        "@catch2//:catch2",
     ],
 )
