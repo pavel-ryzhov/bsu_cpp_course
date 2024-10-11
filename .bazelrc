@@ -3,10 +3,14 @@ common --enable_bzlmod
 # build --action_env=CXX=clang++
 build --disk_cache=~/.cache/shared_bazel_action_cache/
 test --disk_cache=~/.cache/shared_bazel_action_cache/
+run --disk_cache=~/.cache/shared_bazel_action_cache/
+
+
 test --test_verbose_timeout_warnings
 
 build --cxxopt='-std=c++2b'
 test --cxxopt='-std=c++2b'
+run --cxxopt='-std=c++2b'
 
 # TODO(sokolik): doesn't work with  assembler
 # build --copt="--language=c++"
@@ -14,9 +18,11 @@ test --cxxopt='-std=c++2b'
 
 build --cxxopt="-O3"
 test --cxxopt="-O3"
+run --cxxopt="-O3"
 
 build --cxxopt='-Wno-pragma-once-outside-header'
 test --cxxopt='-Wno-pragma-once-outside-header'
+run --cxxopt='-Wno-pragma-once-outside-header'
 
 
 build --copt="-fdiagnostics-color=always"
@@ -33,6 +39,7 @@ run --copt="-fdiagnostics-color=always"
 
 build --color=yes
 test --color=yes
+run --color=yes
 
 # if you set this curses, you will break all ci print
 # build --curses=yes
@@ -41,21 +48,28 @@ test --color=yes
 # Promote unused result and variable warnings to errors.
 build --cxxopt='-Werror=unused-result'
 test --cxxopt='-Werror=unused-result'
+run --cxxopt='-Werror=unused-result'
+
+
 build --cxxopt='-Werror=unused-variable'
 test --cxxopt='-Werror=unused-variable'
+run --cxxopt='-Werror=unused-variable'
 
 # Promote warnings about missing braces on if/else blocks to errors.
 build --cxxopt='-Werror=dangling-else'
 test --cxxopt='-Werror=dangling-else'
+run --cxxopt='-Werror=dangling-else'
 
 # TODO(sokolik): fix it
 build --copt='-Wno-deprecated-declarations'
 test --copt='-Wno-deprecated-declarations'
+run --copt='-Wno-deprecated-declarations'
 
 # build --test_arg=--colour-mode=ansi
 # test --test_arg=--colour-mode=ansi
 build --test_output=errors
 test --test_output=errors
+run --test_output=errors
 
 ###############################################################
 # Use `bazel build --config=release` to enable these settings #
