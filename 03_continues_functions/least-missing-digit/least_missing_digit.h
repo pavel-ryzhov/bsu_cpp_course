@@ -13,5 +13,5 @@ inline int LeastMissingDigit(int n) {
             return i;
         }
     }
-    return -1;
+    return 0;
 }
