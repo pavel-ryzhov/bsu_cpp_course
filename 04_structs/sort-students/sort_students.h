@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdexcept>
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -12,5 +12,14 @@ struct Student {
 enum class SortType { kByName, kByDate };
 
 inline void SortStudents(std::vector<Student>* students, SortType sort_type) {
-    throw std::runtime_error{"Not implemented!"};
+    std::sort(students->begin(), students->end(), [&](const Student& a, const Student& b) {
+        switch (sort_type) {
+            case SortType::kByName:
+                return a.name < b.name;
+            case SortType::kByDate:
+                return a.year < b.year || a.month < b.month || a.day < b.day;
+            default:
+                return false;
+        }
+    });
 }
