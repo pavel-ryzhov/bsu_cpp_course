@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -9,7 +10,7 @@ struct Student {
     int year, month, day;
 };
 
-enum class SortType { kByName, kByDate };
+enum class SortType : uint8_t { kByName, kByDate };
 
 inline void SortStudents(std::vector<Student>* students, SortType sort_type) {
     std::sort(students->begin(), students->end(), [&](const Student& a, const Student& b) {
