@@ -31,6 +31,4 @@ function(add_task name)
   endif()
 endfunction()
 
-add_task(05_classes_begin/images)
-
 # add_task(09_control_work/kr1)
