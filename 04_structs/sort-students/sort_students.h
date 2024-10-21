@@ -30,7 +30,7 @@ inline bool CompareStudentsByName(const Student& a, const Student& b) {
 }
 
 inline void SortStudents(std::vector<Student>* students, SortType sort_type) {
-    std::ranges::sort(students->begin(), students->end(), [&](const Student& a, const Student& b) {
+    std::sort(students->begin(), students->end(), [&](const Student& a, const Student& b) {
         if (Equal(a, b)) {
             return false;
         }
