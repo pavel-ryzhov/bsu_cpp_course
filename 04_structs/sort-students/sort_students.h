@@ -12,28 +12,22 @@ struct Student {
 
 enum class SortType : uint8_t { kByName, kByDate };
 
-bool CompareStudents(const Student& a, const Student& b);
+inline bool CompareStudents(const Student& a, const Student& b);
 
-bool CompareStudentsByName(const Student& a, const Student& b);
-
-inline bool Equal(const Student& a, const Student& b) {
-    return a.name == b.name && a.surname == b.surname && a.year == b.year && a.month == b.month &&
-           a.day == b.day;
-}
+inline bool CompareStudentsByName(const Student& a, const Student& b);
 
 inline bool CompareStudents(const Student& a, const Student& b) {
-    return a.year < b.year || a.month < b.month || a.day < b.day || CompareStudentsByName(a, b);
+    return a.year < b.year || a.month < b.month || a.day < b.day ||
+           a.surname.compare(b.surname) < 0 || a.name.compare(b.name) < 0;
 }
 
 inline bool CompareStudentsByName(const Student& a, const Student& b) {
-    return a.surname.compare(b.surname) < 0 || a.name.compare(b.name) < 0 || CompareStudents(a, b);
+    return a.surname.compare(b.surname) < 0 || a.name.compare(b.name) < 0 || a.year < b.year ||
+           a.month < b.month || a.day < b.day;
 }
 
 inline void SortStudents(std::vector<Student>* students, SortType sort_type) {
     std::sort(students->begin(), students->end(), [&](const Student& a, const Student& b) {
-        if (Equal(a, b)) {
-            return false;
-        }
         switch (sort_type) {
             case SortType::kByName:
                 return CompareStudentsByName(a, b);
