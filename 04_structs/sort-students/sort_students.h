@@ -16,7 +16,7 @@ inline void SortStudents(std::vector<Student>* students, SortType sort_type) {
     std::ranges::sort(students->begin(), students->end(), [&](const Student& a, const Student& b) {
         switch (sort_type) {
             case SortType::kByName:
-                return a.name < b.name || a.surname < b.surname;
+                return a.name.compare(b.name) < 0 || a.surname.compare(b.surname) < 0;
             case SortType::kByDate:
                 return a.year < b.year || a.month < b.month || a.day < b.day;
             default:
