@@ -18,13 +18,14 @@ struct Date {
 
 inline void SortStudents(
     std::vector<std::tuple<StudentName, Date, int, std::vector<std::string>>>& students) {
-    std::ranges::sort(
-        students, [&](const std::tuple<StudentName, Date, int, std::vector<std::string>>& a,
-                      const std::tuple<StudentName, Date, int, std::vector<std::string>>& b) {
+    std::sort(
+        students.begin(), students.end(),
+        [&](const std::tuple<StudentName, Date, int, std::vector<std::string>>& a,
+            const std::tuple<StudentName, Date, int, std::vector<std::string>>& b) {
             const auto& [name1, date1, score1, universities1] = a;
             const auto& [name2, date2, score2, universities2] = b;
-            return std::tie(score1, date1.year, date1.month, date1.day, name1.surname, name1.name) <
-                   std::tie(score2, date2.year, date2.month, date2.day, name2.surname, name2.name);
+            return std::tie(score2, date1.year, date1.month, date1.day, name1.surname, name1.name) <
+                   std::tie(score1, date2.year, date2.month, date2.day, name2.surname, name2.name);
         });
 }
 
