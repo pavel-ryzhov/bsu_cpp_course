@@ -48,5 +48,10 @@ inline std::map<std::string, std::vector<StudentName>> GetStudents(
             }
         }
     }
+    for (auto& [fst, snd] : result) {
+        std::sort(snd.begin(), snd.end(), [](const auto& a, const auto& b) {
+            return std::tie(a.surname, a.name) < std::tie(b.surname, b.name);
+        });
+    }
     return result;
 }
