@@ -21,5 +21,5 @@ inline bool IsPointInTriangle(const Triangle& t, const Point& pt) {
     if (r1 == 0 || r2 == 0 || r3 == 0) {
         return false;
     }
-    return (r1 < 0 && r2 < 0 && r3 < 0);
+    return (r1 > 0 && r2 > 0 && r3 > 0) || (r1 < 0 && r2 < 0 && r3 < 0);
 }
