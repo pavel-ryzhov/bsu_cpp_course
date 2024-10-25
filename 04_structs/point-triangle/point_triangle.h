@@ -17,7 +17,7 @@ inline bool IsPointInTriangle(const Triangle& t, const Point& pt) {
     const int r2 = Multiply(pt.x - t.b.x, pt.y - t.b.y, t.c.x - t.b.x, t.c.y - t.b.y);
     const int r3 = Multiply(pt.x - t.c.x, pt.y - t.c.y, t.a.x - t.c.x, t.a.y - t.c.y);
     if (r1 == 0 || r2 == 0 || r3 == 0) {
-        return false;
+        return true;
     }
     return (r1 > 0 && r2 > 0 && r3 > 0) || (r1 < 0 && r2 < 0 && r3 < 0);
 }
