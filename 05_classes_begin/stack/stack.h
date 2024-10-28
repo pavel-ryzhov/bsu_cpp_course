@@ -5,7 +5,7 @@
 
 class Stack {
    public:
-    void Push(int x) {
+    void Push(const int x) {
         stack_.push_back(x);
     }
 
