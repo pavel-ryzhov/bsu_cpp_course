@@ -5,30 +5,30 @@
 
 class Stack {
    public:
-    void Push(const int x) {
-        stack_.push_back(x);
+    void Push(int x) {
+        vector_.push_back(x);
     }
 
     bool Pop() {
-        if (stack_.empty()) {
+        if (vector_.empty()) {
             return false;
         }
-        stack_.pop_back();
+        vector_.pop_back();
         return true;
     }
 
     [[nodiscard]] int Top() const {
-        return stack_.back();
+        return vector_.back();
     }
 
     [[nodiscard]] bool Empty() const {
-        return stack_.empty();
+        return vector_.empty();
     }
 
     [[nodiscard]] size_t Size() const {
-        return stack_.size();
+        return vector_.size();
     }
 
    private:
-    std::vector<int> stack_;
+    std::vector<int> vector_;
 };
