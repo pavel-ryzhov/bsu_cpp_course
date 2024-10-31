@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -7,11 +8,10 @@
 #include <stdexcept>
 #include <string>
 
-// template<std::random_access_iterator T>
 class StringView {
    public:
     StringView() = default;
-    StringView(const StringView&) = default;
+    StringView(const StringView& other) = default;
     StringView(const StringView&&) = delete;
     StringView& operator=(const StringView&) = default;
     StringView& operator=(const StringView&&) = delete;
@@ -24,27 +24,27 @@ class StringView {
         : data_(str.data()), size_(str.size()) {
     }
 
-    StringView(const char* str, size_t size) : data_(str), size_(size) {
-    }
-
     StringView(const char* str)  // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
         : data_(str), size_(std::strlen(str)) {
+    }
+
+    StringView(const char* str, size_t size) : data_(str), size_(size) {
     }
 
     StringView(std::nullptr_t) = delete;
 
     template <std::random_access_iterator T>
-    StringView(T first, T last) : data_(first), size_(last - first) {
+    StringView(T first, T last) : data_(&*first), size_(std::distance(first, last)) {
     }
 
     char operator[](size_t index) const {
         return At(index);
     }
 
-    [[nodiscard]] std::string Substr(
+    [[nodiscard]] StringView Substr(
         size_t start = 0,                         // NOLINT(fuchsia-default-arguments-declarations)
         size_t size = std::string::npos) const {  // NOLINT(fuchsia-default-arguments-declarations)
-        return {std::next(data_, static_cast<int64_t>(start)), size};
+        return {std::next(data_, static_cast<int64_t>(start)), std::min(size, size_ - start)};
     }
 
     [[nodiscard]] const char* Data() const {
@@ -77,7 +77,6 @@ class StringView {
     ~StringView() = default;
 
    private:
-    // T data_ = nullptr;
     const char* data_ = nullptr;
     size_t size_ = 0;
 };
