@@ -8,7 +8,8 @@
 #include <cstdint>
 #include <stdexcept>
 
-using Image = Matrix<RGB>;
+using MatrixImage = Matrix<RGB>;
+using RGBImage = Matrix<RGB>;
 using GrayscaleImage = Matrix<uint8_t>;
 
 template <class T>
@@ -16,16 +17,11 @@ inline Matrix<T> FlipHorizontally(const Matrix<T>&) {
     throw std::runtime_error{"Not implemented"};
 }
 
-template <class T>
-inline Matrix<T> Transpose(const Matrix<T>&) {
+inline GrayscaleImage ToGray(const RGBImage&) {
     throw std::runtime_error{"Not implemented"};
 }
 
-inline GrayscaleImage ToGray(const Image&) {
-    throw std::runtime_error{"Not implemented"};
-}
-
-inline Image Blend(const Image&, const Image&) {
+inline RGBImage Blend(const RGBImage&, const RGBImage&) {
     throw std::runtime_error{"Not implemented"};
 }
 
@@ -34,14 +30,12 @@ inline Matrix<T> RotateClockwise(const Matrix<T>&) {
     throw std::runtime_error{"Not implemented"};
 }
 
-inline Image MixChannels(const Image& image, const Matrix<float>& filter) {
-    (void)image;
-    (void)filter;
+inline RGBImage MixChannels(
+    [[maybe_unused]] const RGBImage& image, [[maybe_unused]] const Matrix<float>& filter) {
     throw std::runtime_error{"Not implemented"};
 }
 
-inline Image Convolve(const Image& image, const Matrix<float>& kernel) {
-    (void)image;
-    (void)kernel;
+inline RGBImage Convolve(
+    [[maybe_unused]] const RGBImage& image, [[maybe_unused]] const Matrix<float>& kernel) {
     throw std::runtime_error{"Not implemented"};
 }
