@@ -13,5 +13,5 @@ class Intersection {
     [[nodiscard]] double GetDistance() const;
 
    private:
-   // data
+    // data
 };
