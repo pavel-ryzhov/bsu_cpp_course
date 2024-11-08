@@ -1,8 +1,23 @@
 #pragma once
 
-#include <stdexcept>
-
 template <class Iterator>
 Iterator LocalMax(Iterator first, Iterator last) {
-    throw std::runtime_error{"Not implemented"};
+    auto it = first;
+    while (it != last) {
+        bool left = it == first;
+        if (!left) {
+            left = *first < *it;
+            ++first;
+        }
+        bool right = it == last;
+        if (!right) {
+            const auto& a = *it;
+            ++it;
+            right = a > *it;
+        }
+        if (left && right) {
+            return it;
+        }
+    }
+    return last;
 }
