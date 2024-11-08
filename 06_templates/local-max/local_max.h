@@ -9,13 +9,13 @@ Iterator LocalMax(Iterator first, Iterator last) {
             left = *first < *it;
             ++first;
         }
-        bool right = it == last;
+        const auto& a = *it;
+        bool right = ++it == last;
         if (!right) {
-            const auto& a = *it;
-            ++it;
             right = a > *it;
         }
         if (left && right) {
+            --it;
             return it;
         }
     }
