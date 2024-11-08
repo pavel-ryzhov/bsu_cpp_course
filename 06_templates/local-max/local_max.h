@@ -12,7 +12,7 @@ Iterator LocalMax(Iterator first, Iterator last) {
         const auto& a = *it;
         bool right = ++it == last;
         if (!right) {
-            right = a > *it;
+            right = *it < a;
         }
         if (left && right) {
             --it;
