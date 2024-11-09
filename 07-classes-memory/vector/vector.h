@@ -18,12 +18,14 @@ class Vector {
         std::ranges::copy(list, begin());
     }
 
-    Vector(Vector&& other) noexcept {
-        operator=(other);
+    Vector(Vector&& other) noexcept
+        : size_{other.size_}, capacity_{other.capacity_}, begin_{other.begin_}, end_{other.end_} {
+        other.begin_ = nullptr;
+        other.end_ = nullptr;
     }
 
     Vector& operator=(const Vector& other) {
-        if (this == &other) {
+        if (this == &other) [[unlikely]] {
             return *this;
         }
         size_ = other.size_;
@@ -33,20 +35,23 @@ class Vector {
     }
 
     Vector& operator=(Vector&& other) noexcept {
-        if (this == &other) {
+        if (this == &other) [[unlikely]] {
             return *this;
         }
+        this->~Vector();
         begin_ = other.begin_;
         end_ = other.end_;
         other.begin_ = nullptr;
         other.end_ = nullptr;
-        size_ = other.size_;
         capacity_ = other.capacity_;
+        size_ = other.size_;
         return *this;
     }
 
     ~Vector() {
         delete[] begin_;
+        begin_ = nullptr;
+        end_ = nullptr;
     }
 
     explicit Vector(size_t size) : size_{size} {
@@ -67,8 +72,7 @@ class Vector {
         } else if (size_ == capacity_) [[unlikely]] {
             Allocate(capacity_ * 2);
         }
-        (*this)[size_] = value;
-        ++size_;
+        (*this)[size_++] = value;
         end_ = std::next(end_);
     }
 
