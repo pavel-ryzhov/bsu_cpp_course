@@ -11,26 +11,23 @@ class LruCache {
     }
 
     LruCache(const LruCache&) = delete;
+
     LruCache& operator=(const LruCache&) = delete;
+
     LruCache(LruCache&&) = delete;
+
     LruCache& operator=(LruCache&&) = delete;
+
     ~LruCache() = default;
 
     void Set(const std::string& key, const std::string& value) {
-        const auto& it = values_.find(key);
-        if (values_.size() >= max_size_) {
-            if (it != values_.end()) {
-                lru_list_.erase(iterators_[key]);
-            } else {
-                const auto& for_remove = lru_list_.back();
-                values_.erase(for_remove);
-                iterators_.erase(for_remove);
-                lru_list_.pop_back();
-            }
-        } else {
-            if (it != values_.end()) {
-                lru_list_.erase(iterators_[key]);
-            }
+        if (values_.contains(key)) {
+            lru_list_.erase(iterators_[key]);
+        } else if (values_.size() >= max_size_) {
+            const auto& for_remove = lru_list_.back();
+            values_.erase(for_remove);
+            iterators_.erase(for_remove);
+            lru_list_.pop_back();
         }
         lru_list_.push_front(key);
         values_[key] = value;
@@ -42,6 +39,7 @@ class LruCache {
             *value = it->second;
             lru_list_.erase(iterators_[key]);
             lru_list_.push_front(key);
+            iterators_[key] = lru_list_.begin();
             return true;
         }
         return false;
