@@ -3,18 +3,34 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <initializer_list>
 
 constexpr size_t kChunkSize = 128;
+
+template <class T, class V>
+T* PointerArithmetics(T* pointer, V value) {
+    return std::next(pointer, value);
+}
 
 class Deque {
    public:
     Deque() : chunks_(new int*[2]()), chunks_size_(2) {
     }
-    Deque(const Deque& other) : chunks_(new int*[other.chunks_size_]()), chunks_size_(other.chunks_size_), begin_(other.begin_), end_(other.end_) {
+
+    Deque(const Deque& other)
+        : chunks_(new int*[other.chunks_size_]())
+        , chunks_size_(other.chunks_size_)
+        , begin_(other.begin_)
+        , end_(other.end_) {
         CopyChunks(other.chunks_);
     }
-    Deque(Deque&& other) noexcept : chunks_(other.chunks_), chunks_size_(other.chunks_size_), begin_(other.begin_), end_(other.end_) {
+
+    Deque(Deque&& other) noexcept
+        : chunks_(other.chunks_)
+        , chunks_size_(other.chunks_size_)
+        , begin_(other.begin_)
+        , end_(other.end_) {
         other.chunks_ = nullptr;
     }
 
@@ -24,16 +40,16 @@ class Deque {
 
     Deque(std::initializer_list<int> list) {
         Resize(list.size());
-        auto it = list.begin();
-        for (size_t i = 0; i < list.size(); ++i, ++it) {
-            this->At(i) = *it;
+        int64_t counter = 0;
+        for (const auto it : list) {
+            this->At(counter++) = it;
         }
     }
 
     Deque& operator=(const Deque& other) {
         if (this != &other) {
             this->~Deque();
-            chunks_ = new int*[other.chunks_size_]();
+            chunks_ = new int*[other.chunks_size_]();  // NOLINT(cppcoreguidelines-owning-memory)
             chunks_size_ = other.chunks_size_;
             begin_ = other.begin_;
             end_ = other.end_;
@@ -41,6 +57,7 @@ class Deque {
         }
         return *this;
     }
+
     Deque& operator=(Deque&& other) noexcept {
         if (this != &other) {
             this->~Deque();
@@ -52,6 +69,7 @@ class Deque {
         }
         return *this;
     }
+
     ~Deque() {
         DeallocateAllChunks();
         delete[] chunks_;
@@ -66,25 +84,26 @@ class Deque {
     }
 
     void PushBack(int value) {
-        if (Size() + 1 > kChunkSize && GetChunk(end_ + 1) == GetChunk(begin_)) [[unlikely]] {
+        if (Size() + 1 > kChunkSize && GetChunk(static_cast<int64_t>(end_) + 1) ==
+                                           GetChunk(static_cast<int64_t>(begin_))) [[unlikely]] {
             Reallocate();
         }
-        AllocateChunkIfNecessary(GetChunk(end_));
+        AllocateChunkIfNecessary(GetChunk(static_cast<int64_t>(end_)));
         this->At(static_cast<int64_t>(end_)) = value;
-        end_ = ValidIndex(end_ + 1);
+        end_ = ValidIndex(static_cast<int64_t>(end_) + 1);
     }
 
     void PopBack() {
         const int64_t index = static_cast<int64_t>(end_) - 1;
         end_ = ValidIndex(index);
-        if (GetPosInChunk(end_) == 0) [[unlikely]] {
-            DeallocateChunk(GetChunk(end_));
+        if (GetPosInChunk(static_cast<int64_t>(end_)) == 0) [[unlikely]] {
+            DeallocateChunk(GetChunk(static_cast<int64_t>(end_)));
         }
-        DeallocateLastChunkIfNecessary();
     }
 
     void PushFront(int value) {
-        if (Size() + 1 > kChunkSize && GetChunk(static_cast<int64_t>(begin_) - 1) == GetChunk(end_)) [[unlikely]] {
+        if (Size() + 1 > kChunkSize && GetChunk(static_cast<int64_t>(begin_) - 1) ==
+                                           GetChunk(static_cast<int64_t>(end_))) [[unlikely]] {
             Reallocate();
         }
         const int64_t index = static_cast<int64_t>(begin_) - 1;
@@ -94,32 +113,29 @@ class Deque {
     }
 
     void PopFront() {
-        begin_ = ValidIndex(begin_ + 1);
-        if (GetPosInChunk(begin_) == 0) [[unlikely]] {
+        begin_ = ValidIndex(static_cast<int64_t>(begin_) + 1);
+        if (GetPosInChunk(static_cast<int64_t>(begin_)) == 0) [[unlikely]] {
             DeallocateChunk(GetChunk(static_cast<int64_t>(begin_) - 1));
         }
-        DeallocateLastChunkIfNecessary();
     }
 
     int& operator[](int64_t index) {
         const int64_t i = static_cast<int64_t>(begin_) + index;
-        return chunks_[GetChunk(i)][GetPosInChunk(i)];
+        return *PointerArithmetics(*PointerArithmetics(chunks_, GetChunk(i)), GetPosInChunk(i));
     }
 
     const int& operator[](int64_t index) const {
         const int64_t i = static_cast<int64_t>(begin_) + index;
-        return chunks_[GetChunk(i)][GetPosInChunk(i)];
+        return *PointerArithmetics(*PointerArithmetics(chunks_, GetChunk(i)), GetPosInChunk(i));
     }
 
     [[nodiscard]] size_t Size() const {
-        if (MaxCapacity() == 0) [[unlikely]] {
-            return 0;
-        }
-        return ValidIndex(static_cast<int64_t>(end_) - begin_);
+        return ValidIndex(static_cast<int64_t>(end_) - static_cast<int64_t>(begin_));
     }
 
     [[nodiscard]] size_t Capacity() const {
-        return static_cast<size_t>(std::ceil(static_cast<double>(Size()) / kChunkSize)) * kChunkSize;
+        return static_cast<size_t>(std::ceil(static_cast<double>(Size()) / kChunkSize)) *
+               kChunkSize;
     }
 
     void Clear() {
@@ -135,11 +151,13 @@ class Deque {
     size_t end_ = 0;
 
     [[nodiscard]] int& At(int64_t index) {
-        return chunks_[GetChunk(index)][GetPosInChunk(index)];
+        return *PointerArithmetics(
+            *PointerArithmetics(chunks_, GetChunk(index)), GetPosInChunk(index));
     }
 
     [[nodiscard]] const int& At(int64_t index) const {
-        return chunks_[GetChunk(index)][GetPosInChunk(index)];
+        return *PointerArithmetics(
+            *PointerArithmetics(chunks_, GetChunk(index)), GetPosInChunk(index));
     }
 
     [[nodiscard]] size_t ValidIndex(int64_t index) const {
@@ -147,15 +165,17 @@ class Deque {
     }
 
     [[nodiscard]] size_t MaxCapacity() const {
-        return chunks_size_ * kChunkSize;
+        const auto a = chunks_size_ * kChunkSize;
+        return a == 0 ? -1 : a;
     }
 
     void Resize(size_t size) {
         if (size > 0) {
             chunks_size_ = std::ceil(static_cast<double>(size + 1) / kChunkSize);
-            chunks_ = new int*[chunks_size_]();
+            chunks_ = new int*[chunks_size_]();    // NOLINT(cppcoreguidelines-owning-memory)
             for (size_t i = 0; i < chunks_size_; ++i) {
-                chunks_[i] = new int[kChunkSize]();
+                *PointerArithmetics(chunks_, i) =  // NOLINT(cppcoreguidelines-owning-memory)
+                    new int[kChunkSize]();
             }
             begin_ = 0;
             end_ = size;
@@ -171,49 +191,52 @@ class Deque {
     }
 
     void AllocateChunkIfNecessary(size_t pos) const {
-        if (chunks_[pos] == nullptr) [[unlikely]] {
-            chunks_[pos] = new int[kChunkSize];
+        // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
+        if (*PointerArithmetics(chunks_, pos) == nullptr) [[unlikely]] {
+            *PointerArithmetics(chunks_, pos) =  // NOLINT(cppcoreguidelines-owning-memory)
+                new int[kChunkSize];
         }
     }
 
     void DeallocateAllChunks() const {
         if (chunks_ != nullptr) {
             for (size_t i = 0; i < chunks_size_; ++i) {
-                delete[] chunks_[i];
-                chunks_[i] = nullptr;
+                // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+                delete[] *PointerArithmetics(  // NOLINT(clang-analyzer-core.CallAndMessage)
+                    chunks_, i);
+                *PointerArithmetics(chunks_, i) = nullptr;
             }
         }
     }
 
     void DeallocateChunk(size_t pos) const {
-        delete[] chunks_[pos];
-        chunks_[pos] = nullptr;
-    }
-
-    void DeallocateLastChunkIfNecessary() const {
-        if (begin_ == end_) [[unlikely]] {
-            DeallocateChunk(GetChunk(begin_));
-        }
+        delete[] *PointerArithmetics(chunks_, pos);  // NOLINT(cppcoreguidelines-owning-memory)
+        *PointerArithmetics(chunks_, pos) = nullptr;
     }
 
     void Reallocate() {
-        int** new_chunks = new int*[chunks_size_ * 2]();
-        int** a = std::copy(chunks_ + GetChunk(begin_), chunks_ + chunks_size_, new_chunks);
-        if (GetChunk(begin_) != 0) {
-            std::copy_n(chunks_, GetChunk(begin_), a);
+        int** new_chunks = new int*[chunks_size_ * 2]();  // NOLINT(cppcoreguidelines-owning-memory)
+        int** a = std::copy(
+            PointerArithmetics(chunks_, GetChunk(static_cast<int64_t>(begin_))),
+            PointerArithmetics(chunks_, chunks_size_), new_chunks);
+        if (GetChunk(static_cast<int64_t>(begin_)) != 0) {
+            std::copy_n(chunks_, GetChunk(static_cast<int64_t>(begin_)), a);
         }
         delete[] chunks_;
         chunks_ = new_chunks;
         end_ = (chunks_size_ - 1) * kChunkSize + end_ % kChunkSize;
         begin_ %= kChunkSize;
-        chunks_size_ <<= 1;
+        chunks_size_ <<= 1U;
     }
 
     void CopyChunks(int** from) const {
         for (size_t i = 0; i < chunks_size_; ++i) {
-            if (from[i] != nullptr) {
-                chunks_[i] = new int[kChunkSize];
-                std::copy_n(from[i], kChunkSize, chunks_[i]);
+            // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
+            if (*PointerArithmetics(from, i) != nullptr) {
+                *PointerArithmetics(chunks_, i) =  // NOLINT(cppcoreguidelines-owning-memory)
+                    new int[kChunkSize];
+                std::copy_n(
+                    *PointerArithmetics(from, i), kChunkSize, *PointerArithmetics(chunks_, i));
             }
         }
     }
