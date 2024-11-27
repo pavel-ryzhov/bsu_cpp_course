@@ -22,7 +22,8 @@ class Deque {
         : chunks_(new int*[other.chunks_size_]())
         , chunks_size_(other.chunks_size_)
         , begin_(other.begin_)
-        , end_(other.end_) {
+        , end_(other.end_)
+        , size_(other.size_) {
         CopyChunks(other.chunks_);
     }
 
@@ -30,7 +31,8 @@ class Deque {
         : chunks_(other.chunks_)
         , chunks_size_(other.chunks_size_)
         , begin_(other.begin_)
-        , end_(other.end_) {
+        , end_(other.end_)
+        , size_(other.size_) {
         other.chunks_ = nullptr;
     }
 
@@ -53,6 +55,7 @@ class Deque {
             chunks_size_ = other.chunks_size_;
             begin_ = other.begin_;
             end_ = other.end_;
+            size_ = other.size_;
             CopyChunks(other.chunks_);
         }
         return *this;
@@ -65,6 +68,7 @@ class Deque {
             chunks_size_ = other.chunks_size_;
             begin_ = other.begin_;
             end_ = other.end_;
+            size_ = other.size_;
             other.chunks_ = nullptr;
         }
         return *this;
@@ -81,6 +85,7 @@ class Deque {
         std::swap(chunks_size_, other.chunks_size_);
         std::swap(begin_, other.begin_);
         std::swap(end_, other.end_);
+        std::swap(size_, other.size_);
     }
 
     void PushBack(int value) {
@@ -91,6 +96,7 @@ class Deque {
         AllocateChunkIfNecessary(GetChunk(static_cast<int64_t>(end_)));
         this->At(static_cast<int64_t>(end_)) = value;
         end_ = ValidIndex(static_cast<int64_t>(end_) + 1);
+        ++size_;
     }
 
     void PopBack() {
@@ -99,6 +105,7 @@ class Deque {
         if (GetPosInChunk(static_cast<int64_t>(end_)) == 0) [[unlikely]] {
             DeallocateChunk(GetChunk(static_cast<int64_t>(end_)));
         }
+        --size_;
     }
 
     void PushFront(int value) {
@@ -110,6 +117,7 @@ class Deque {
         AllocateChunkIfNecessary(GetChunk(index));
         this->At(index) = value;
         begin_ = ValidIndex(index);
+        ++size_;
     }
 
     void PopFront() {
@@ -117,20 +125,24 @@ class Deque {
         if (GetPosInChunk(static_cast<int64_t>(begin_)) == 0) [[unlikely]] {
             DeallocateChunk(GetChunk(static_cast<int64_t>(begin_) - 1));
         }
+        --size_;
     }
 
-    int& operator[](int64_t index) {
-        const int64_t i = static_cast<int64_t>(begin_) + index;
+    int& operator[](size_t index) {
+        // const int64_t i = static_cast<int64_t>(begin_) + index;
+        const auto i = static_cast<int64_t>(begin_ + index);
         return *PointerArithmetics(*PointerArithmetics(chunks_, GetChunk(i)), GetPosInChunk(i));
     }
 
-    const int& operator[](int64_t index) const {
-        const int64_t i = static_cast<int64_t>(begin_) + index;
+    const int& operator[](size_t index) const {
+        // const int64_t i = static_cast<int64_t>(begin_) + index;
+        const auto i = static_cast<int64_t>(begin_ + index);
         return *PointerArithmetics(*PointerArithmetics(chunks_, GetChunk(i)), GetPosInChunk(i));
     }
 
     [[nodiscard]] size_t Size() const {
-        return ValidIndex(static_cast<int64_t>(end_) - static_cast<int64_t>(begin_));
+        return size_;
+        // return ValidIndex(static_cast<int64_t>(end_) - static_cast<int64_t>(begin_));
     }
 
     [[nodiscard]] size_t Capacity() const {
@@ -142,6 +154,7 @@ class Deque {
         DeallocateAllChunks();
         begin_ = 0;
         end_ = 0;
+        size_ = 0;
     }
 
    private:
@@ -149,6 +162,7 @@ class Deque {
     size_t chunks_size_ = 0;
     size_t begin_ = 0;
     size_t end_ = 0;
+    size_t size_ = 0;
 
     [[nodiscard]] int& At(int64_t index) {
         return *PointerArithmetics(
@@ -179,6 +193,7 @@ class Deque {
             }
             begin_ = 0;
             end_ = size;
+            size_ = size;
         }
     }
 
