@@ -2,26 +2,44 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <iterator>
+#include <utility>
 
 class ListHook {
    public:
-    bool IsLinked() const;
-    void Unlink();
+    [[nodiscard]] bool IsLinked() const {
+        return prev_ != this;
+    }
+
+    void Unlink() {
+        prev_->next_ = next_;
+        next_->prev_ = prev_;
+        prev_ = this;
+        next_ = this;
+    }
 
     ListHook(const ListHook&) = delete;
     ListHook& operator=(const ListHook&) = delete;
+    ListHook(ListHook&&) = delete;
+    ListHook& operator=(ListHook&&) = delete;
 
    protected:
-    ListHook();
+    ListHook() : prev_(this), next_(this) {
+    }
 
-    // Must unlink element from list
-    ~ListHook();
-
-    // that helper function might be useful
-    void LinkBefore(ListHook* other);
-
+    ~ListHook() {
+        Unlink();
+    }
     template <class T>
     friend class List;
+
+   private:
+    ListHook* prev_ = nullptr;
+    ListHook* next_ = nullptr;
+
+    static ListHook* New() {    // костыль
+        return new ListHook();  // NOLINT(cppcoreguidelines-owning-memory)
+    }
 };
 
 template <class T>
@@ -34,52 +52,148 @@ class List {
         using difference_type = ptrdiff_t;
         using pointer = T*;
         using reference = T&;
+
+        explicit Iterator(ListHook* node) : node_(node) {
+        }
+
+        Iterator() = default;
+
+        Iterator& operator++() {
+            node_ = node_->next_;
+            return *this;
+        }
+
+        Iterator operator++(int) {
+            Iterator tmp = *this;
+            ++*this;
+            return tmp;
+        }
+
+        Iterator& operator--() {
+            node_ = node_->prev_;
+            return *this;
+        }
+
+        Iterator operator--(int) {
+            Iterator tmp = *this;
+            --*this;
+            return tmp;
+        }
+
+        T& operator*() const {
+            return *static_cast<T*>(node_);
+        }
+
+        T* operator->() const {
+            return &*static_cast<T*>(node_);
+        }
+
+        bool operator==(const Iterator& other) const {
+            return node_ == other.node_;
+        }
+
+        bool operator!=(const Iterator& other) const {
+            return !(*this == other);
+        }
+
+       private:
+        ListHook* node_ = nullptr;
     };
 
-    List();
-    List(const List&) = delete;
-    List(List&& other);
+    List() : dummy_(new ListHook()) {
+    }
 
-    // must unlink all elements from list
-    ~List();
+    List(const List&) = delete;
+
+    List(List&& other) noexcept : dummy_(std::exchange(other.dummy_, ListHook::New())) {
+    }
 
     List& operator=(const List&) = delete;
-    List& operator=(List&& other);
 
-    bool IsEmpty() const;
-    // this method is allowed to be O(n)
-    size_t Size() const;
+    List& operator=(List&& other) noexcept {
+        if (this != &other) {
+            this->~List();
+            new (this) List(std::move(other));
+        }
+        return *this;
+    }
 
-    // note that IntrusiveList doesn't own elements,
-    // and never copies or moves T
-    void PushBack(T* elem);
-    void PushFront(T* elem);
+    [[nodiscard]] bool IsEmpty() const {
+        return !dummy_->IsLinked();
+    }
 
-    T& Front();
-    const T& Front() const;
+    [[nodiscard]] size_t Size() const {
+        return std::distance(Begin(), End());
+    }
 
-    T& Back();
-    const T& Back() const;
+    void PushBack(T* elem) {
+        LinkAfter(dummy_->prev_, elem);
+    }
 
-    void PopBack();
-    void PopFront();
+    void PushFront(T* elem) {
+        LinkAfter(dummy_, elem);
+    }
 
-    Iterator Begin();
-    Iterator End();
+    [[nodiscard]] T& Front() {
+        return *static_cast<T*>(dummy_->next_);
+    }
 
-    // complexity of this function must be O(1)
-    Iterator IteratorTo(T* element);
+    [[nodiscard]] const T& Front() const {
+        return *static_cast<T*>(dummy_->next_);
+    }
+
+    [[nodiscard]] T& Back() {
+        return *static_cast<T*>(dummy_->prev_);
+    }
+
+    [[nodiscard]] const T& Back() const {
+        return *static_cast<T*>(dummy_->prev_);
+    }
+
+    void PopBack() {
+        Back().Unlink();
+    }
+
+    void PopFront() {
+        Front().Unlink();
+    }
+
+    [[nodiscard]] Iterator Begin() const {
+        return Iterator(dummy_->next_);
+    }
+
+    [[nodiscard]] Iterator End() const {
+        return Iterator(dummy_);
+    }
+
+    [[nodiscard]] Iterator IteratorTo(T* element) const {
+        return Iterator(element);
+    }
+
+    ~List() {
+        while (!IsEmpty()) {
+            PopBack();
+        }
+        delete dummy_;
+    }
 
    private:
-    ListHook dummy_;
+    ListHook* dummy_ = nullptr;
+
+    static void LinkAfter(ListHook* target, ListHook* after) {
+        after->next_ = target->next_;
+        target->next_->prev_ = after;
+        after->prev_ = target;
+        target->next_ = after;
+    }
 };
 
 template <class T>
-List<T>::Iterator begin(List<T>& list) {
+typename List<T>::Iterator begin(List<T>& list) {
     return list.Begin();
 }
 
 template <class T>
-List<T>::Iterator end(List<T>& list) {
+typename List<T>::Iterator end(List<T>& list) {
     return list.End();
 }
