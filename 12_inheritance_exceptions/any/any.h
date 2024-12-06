@@ -2,47 +2,108 @@
 
 #include <concepts>
 #include <type_traits>
+#include <utility>
 
 template <class T>
 concept NotAny = !std::same_as<std::remove_cvref_t<T>, class Any>;
 
 class Any {
    public:
-    Any() {
-    }
+    struct InnerBase {
+        InnerBase() = default;
+        InnerBase(const InnerBase&) = default;
+        InnerBase(InnerBase&&) = default;
+        InnerBase& operator=(const InnerBase&) = default;
+        InnerBase& operator=(InnerBase&&) = default;
+        virtual ~InnerBase() = default;
+        [[nodiscard]] virtual InnerBase* Clone() const = 0;
+    };
 
-    // T&& - universal (forwarding) reference
-    // use std::forward inside this constructor
+    template <class T>
+    struct Inner final : InnerBase {
+        // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
+        Inner(T value) : value_(std::forward<T>(value)) {
+        }
+
+        ~Inner() override = default;
+        Inner(const Inner&) = default;
+        Inner& operator=(const Inner&) = default;
+        Inner(Inner&&) = default;
+        Inner& operator=(Inner&&) = default;
+
+        [[nodiscard]] InnerBase* Clone() const override {
+            // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+            return new Inner(value_);
+        }
+
+        const T& operator*() const {
+            return value_;
+        }
+
+        T& operator*() {
+            return value_;
+        }
+
+       private:
+        T value_;
+    };
+
+    Any() = default;
+
     template <NotAny T>
-    Any(T&& value) {
+    // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
+    Any(T value) : ptr_(new Inner<T>(std::forward<T>(value))) {
     }
 
-    Any(const Any& other) {
+    Any(const Any& other) : ptr_(other.ptr_ == nullptr ? nullptr : other.ptr_->Clone()) {
     }
 
-    Any(Any&& other) {
+    Any(Any&& other) noexcept : ptr_(std::exchange(other.ptr_, nullptr)) {
     }
 
     Any& operator=(const Any& other) {
+        Any tmp(other);
+        std::swap(tmp.ptr_, this->ptr_);
+        return *this;
     }
 
-    Any& operator=(Any&& other) {
-    }
-
-    ~Any() {
-    }
-
-    bool Empty() const {
-        return true;
-    }
-
-    void Clear() {
-    }
-
-    void Swap(Any& other) {
+    Any& operator=(Any&& other) noexcept {
+        Any tmp(std::move(other));
+        std::swap(tmp.ptr_, this->ptr_);
+        return *this;
     }
 
     template <class T>
-    const T& GetValue() const {
+    Any& operator=(T src) {
+        delete ptr_;
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+        ptr_ = new Inner<T>(std::forward<T>(src));
+        return *this;
     }
+
+    ~Any() {
+        delete ptr_;
+        ptr_ = nullptr;
+    }
+
+    [[nodiscard]] bool Empty() const {
+        return ptr_ == nullptr;
+    }
+
+    void Clear() {
+        delete ptr_;
+        ptr_ = nullptr;
+    }
+
+    void Swap(Any& other) {
+        std::swap(ptr_, other.ptr_);
+    }
+
+    template <class T>
+    [[nodiscard]] const T& GetValue() const {
+        return *dynamic_cast<Inner<T>&>(*ptr_);
+    }
+
+   private:
+    InnerBase* ptr_ = nullptr;
 };
