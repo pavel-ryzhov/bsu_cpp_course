@@ -62,14 +62,18 @@ class Any {
     }
 
     Any& operator=(const Any& other) {
-        Any tmp(other);
-        std::swap(tmp.ptr_, this->ptr_);
+        if (this != &other) {
+            Any tmp(other);
+            std::swap(tmp.ptr_, this->ptr_);
+        }
         return *this;
     }
 
     Any& operator=(Any&& other) noexcept {
-        Any tmp(std::move(other));
-        std::swap(tmp.ptr_, this->ptr_);
+        if (this != &other) {
+            Any tmp(std::move(other));
+            std::swap(tmp.ptr_, this->ptr_);
+        }
         return *this;
     }
 
