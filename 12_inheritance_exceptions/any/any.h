@@ -52,7 +52,7 @@ class Any {
 
     template <NotAny T>
     // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
-    Any(T value) : ptr_(new Inner<T>(std::forward<T>(value))) {
+    Any(T&& value) : ptr_(new Inner<std::decay_t<T>>(std::forward<T>(value))) {
     }
 
     Any(const Any& other) : ptr_(other.ptr_ == nullptr ? nullptr : other.ptr_->Clone()) {
@@ -74,14 +74,6 @@ class Any {
             Any tmp(std::move(other));
             std::swap(tmp.ptr_, this->ptr_);
         }
-        return *this;
-    }
-
-    template <class T>
-    Any& operator=(T src) {
-        delete ptr_;
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-        ptr_ = new Inner<T>(std::forward<T>(src));
         return *this;
     }
 
