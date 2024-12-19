@@ -9,7 +9,7 @@ inline long double AccurateSum(const std::vector<long double>& data) {
     for (size_t i = 1; i < data.size(); ++i) {
         const long double v1 = c + data[i];
         const long double v2 = v1 - c;
-        const long double v3 = c - (v1 - v2) + data[i] - v2;
+        const long double v3 = (c - (v1 - v2)) + (data[i] - v2);
         c = v1;
         d += v3;
     }
