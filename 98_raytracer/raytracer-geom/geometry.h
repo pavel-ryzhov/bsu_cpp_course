@@ -9,12 +9,20 @@
 
 #include <algorithm>
 #include <cmath>
+#include <concepts>
 #include <cstdlib>
 #include <optional>
 
-// constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
-
-inline std::optional<Intersection> GetIntersection(const Ray& ray, const Sphere& sphere) {
+template<class T>
+requires std::same_as<T, Sphere> || std::same_as<T, SphereObject>
+std::optional<Intersection> GetIntersection(const Ray& ray, const T& sph) {
+    const Sphere sphere = [&sph] {
+        if constexpr (std::is_same_v<T, SphereObject>) {
+            return sph.GetInner();
+        } else {
+            return sph;
+        }
+    }();
     const Vector r = ray.GetOrigin() - sphere.GetCenter();
     const double a = std::pow(ray.GetDirection().Length(), 2);
     const double b = 2 * DotProduct(ray.GetDirection(), r);
@@ -45,38 +53,6 @@ inline std::optional<Intersection> GetIntersection(const Ray& ray, const Sphere&
     return Intersection{position, normal, (position - ray.GetOrigin()).Length()};
 }
 
-inline std::optional<Intersection> GetIntersection(const Ray& ray, const Triangle& triangle) {
-    const Vector edge1 = triangle[1] - triangle[0];
-    const Vector edge2 = triangle[2] - triangle[0];
-    const Vector ray_cross_edge2 = CrossProduct(ray.GetDirection(), edge2);
-    const double det = DotProduct(edge1, ray_cross_edge2);
-    if (std::abs(det) < kEpsilon) {
-        return std::nullopt;
-    }
-    const double inv_det = 1. / det;
-    const Vector s = ray.GetOrigin() - triangle[0];
-    const double u = inv_det * DotProduct(s, ray_cross_edge2);
-    if (u < -kEpsilon || u - 1 > kEpsilon) {
-        return std::nullopt;
-    }
-    const Vector s_cross_edge1 = CrossProduct(s, edge1);
-    const double v = inv_det * DotProduct(ray.GetDirection(), s_cross_edge1);
-    if (v < -kEpsilon || u + v - 1 > kEpsilon) {
-        return std::nullopt;
-    }
-    const double t = inv_det * DotProduct(edge2, s_cross_edge1);
-    if (t > kEpsilon) {
-        const Vector position = ray.GetOrigin() + ray.GetDirection() * t;
-        Vector normal = CrossProduct(edge1, edge2);
-        normal.Normalize();
-        if (DotProduct(normal, ray.GetDirection()) > kEpsilon) {
-            normal *= -1;
-        }
-        return Intersection{position, normal, (position - ray.GetOrigin()).Length()};
-    }
-    return std::nullopt;
-}
-
 inline Vector Reflect(const Vector& ray, const Vector& normal) {
     return ray - 2 * DotProduct(ray, normal) * normal;
 }
@@ -99,16 +75,30 @@ inline Vector GetBarycentricCoords(const Triangle& triangle, const Vector& point
     return {1 - u - v, u, v};
 }
 
-inline std::optional<Intersection> GetIntersection(const Ray& ray, const TriangleObject& triangle) {
-    const Vector edge1 = triangle.GetInner()[1] - triangle.GetInner()[0];
-    const Vector edge2 = triangle.GetInner()[2] - triangle.GetInner()[0];
+inline Vector GetInterpolatedNormal(const TriangleObject& triangle, const Vector& position) {
+    const auto baricentric_coords = GetBarycentricCoords(triangle.GetInner(), position);
+    return baricentric_coords[0] * *triangle.GetNormal<0>() + baricentric_coords[1] * *triangle.GetNormal<1>() + baricentric_coords[2] * *triangle.GetNormal<2>();
+}
+
+template<class T>
+requires std::same_as<T, Triangle> || std::same_as<T, TriangleObject>
+std::optional<Intersection> GetIntersection(const Ray& ray, const T& tr) {
+    const Triangle triangle = [&tr] {
+        if constexpr (std::is_same_v<T, TriangleObject>) {
+            return tr.GetInner();
+        } else {
+            return tr;
+        }
+    }();
+    const Vector edge1 = triangle[1] - triangle[0];
+    const Vector edge2 = triangle[2] - triangle[0];
     const Vector ray_cross_edge2 = CrossProduct(ray.GetDirection(), edge2);
     const double det = DotProduct(edge1, ray_cross_edge2);
     if (std::abs(det) < kEpsilon) {
         return std::nullopt;
     }
     const double inv_det = 1. / det;
-    const Vector s = ray.GetOrigin() - triangle.GetInner()[0];
+    const Vector s = ray.GetOrigin() - triangle[0];
     const double u = inv_det * DotProduct(s, ray_cross_edge2);
     if (u < -kEpsilon || u - 1 > kEpsilon) {
         return std::nullopt;
@@ -121,17 +111,19 @@ inline std::optional<Intersection> GetIntersection(const Ray& ray, const Triangl
     const double t = inv_det * DotProduct(edge2, s_cross_edge1);
     if (t > kEpsilon) {
         const Vector position = ray.GetOrigin() + ray.GetDirection() * t;
-        Vector normal{};
-        if (triangle.HasNormals()) {
-            const auto baricentric_coords = GetBarycentricCoords(triangle.GetInner(), position);
-            normal = baricentric_coords[0] * *triangle.GetNormal<0>() + baricentric_coords[1] * *triangle.GetNormal<1>() + baricentric_coords[2] * *triangle.GetNormal<2>();
-        } else {
-            normal = CrossProduct(edge1, edge2);
+        const Vector normal = [&] {
+            if constexpr (std::is_same_v<T, TriangleObject>) {
+                if (tr.HasNormals()) {
+                    return GetInterpolatedNormal(tr, position);
+                }
+            }
+            Vector normal = CrossProduct(edge1, edge2);
             normal.Normalize();
             if (DotProduct(normal, ray.GetDirection()) > kEpsilon) {
                 normal *= -1;
             }
-        }
+            return normal;
+        }();
         return Intersection{position, normal, (position - ray.GetOrigin()).Length()};
     }
     return std::nullopt;

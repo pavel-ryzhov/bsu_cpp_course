@@ -40,6 +40,9 @@ inline void CheckImage(
     auto image = Render(tests_dir / obj_filename, camera_options, render_options);
     if (output_path) {
         image.Write(*output_path);
+        std::cout << "=======\n";
+        std::cout << *output_path << std::endl;
+        std::cout << "=======\n";
     }
     Compare(image, Image{tests_dir / result_filename});
 }

@@ -22,39 +22,6 @@
 #include <optional>
 #include <vector>
 
-// static std::array<Vector, 3> CalculateBasis(Vector new_k) {
-//     new_k.Normalize();
-//     auto new_i = CrossProduct(new_k, {0, 0, 1});
-//     auto new_j = CrossProduct(new_k, new_i);
-//     if (std::abs(new_i.Length()) < kEpsilon) [[unlikely]] {
-//         new_i = CrossProduct({0, 1, 0}, new_k);
-//         new_j = CrossProduct(new_k, new_i);
-//     }
-//     std::cout << new_i << std::endl;
-//     std::cout << new_j << std::endl;
-//     std::cout << new_k << std::endl;
-//     return {new_i, new_j, new_k};
-// }
-// static std::array<Vector, 3> CalculateBasis(Vector new_k) {
-//     new_k.Normalize();
-//     // auto new_i = CrossProduct(new_k, {0, 0, 1});
-//     // auto new_j = CrossProduct(new_k, new_i);
-//     // auto new_j = CrossProduct(new_k, {1, 0, 0});
-//     // auto new_i = CrossProduct(new_j, new_k);
-//     auto new_i = CrossProduct(new_k, {1, 0, 0});
-//     auto new_j = CrossProduct(new_k, new_i);
-//     if (std::abs(new_i.Length()) < kEpsilon) [[unlikely]] {
-//         new_i = CrossProduct({0, 1, 0}, new_k);
-//         new_j = CrossProduct(new_k, new_i);
-//     }
-//     new_i.Normalize();
-//     new_j.Normalize();
-//     std::cout << new_i << std::endl;
-//     std::cout << new_j << std::endl;
-//     std::cout << new_k << std::endl;
-//     return {new_i, new_j, new_k};
-// }
-
 static std::array<Vector, 3> CalculateBasis(Vector new_k) {
     new_k.Normalize();
     auto new_i = CrossProduct({0, 1, 0}, new_k);
@@ -70,11 +37,6 @@ static std::array<Vector, 3> CalculateBasis(Vector new_k) {
     std::cout << new_k << std::endl;
     return {new_i, new_j, new_k};
 }
-
-// static Ray TranslateRay(const std::array<Vector, 3>& basis, const Vector& r0, const Ray& ray) {
-//     return {
-//       TranslateCoords(basis, r0, ray.GetOrigin()), TranslateCoords(basis, r0, ray.GetDirection()) - r0};
-// }
 
 static Vector TranslateVector(
     const std::array<Vector, 3>& basis, const Vector& coords) {
@@ -98,14 +60,8 @@ template <class T>
 requires std::same_as<T, TriangleObject> || std::same_as<T, SphereObject>
 void FindNearestIntersection(
     std::optional<Intersection>& nearest_intersection, const std::vector<T> objects, const Ray& ray) {
-    for (const auto& object : objects) {
-        std::optional<Intersection> intersection;
-        if constexpr (std::is_same_v<T, TriangleObject>) {
-            intersection = GetIntersection(ray, object);
-        } else {
-            intersection = GetIntersection(ray, object.GetInner()); 
-        }        
-        if (intersection && (!nearest_intersection || intersection->GetDistance() < nearest_intersection->GetDistance())) {
+    for (const auto& object : objects) {      
+        if (const auto intersection = GetIntersection(ray, object); intersection && (!nearest_intersection || intersection->GetDistance() < nearest_intersection->GetDistance())) {
             nearest_intersection = intersection;
         }
     }
@@ -120,17 +76,11 @@ inline Image Render(
     const auto pixel_size = width / camera_options.screen_width;
     const auto basis = CalculateBasis(camera_options.look_from - camera_options.look_to);
     std::vector<std::vector<Vector>> pixel_colors(camera_options.screen_height, std::vector<Vector>(camera_options.screen_width, Vector{}));
-    // std::vector<std::vector<Vector>> pixel_colors(camera_options.screen_height, std::vector<Vector>(camera_options.screen_width, render_options.mode == RenderMode::kDepth ? Vector{1, 1, 1} : Vector{0, 0, 0}));
     double max_distance = 0;
     double max_color = 0;
     auto get_color = [&max_distance, &max_color, &render_options](const std::optional<Intersection>& intersection) -> Vector {
         switch (render_options.mode) {
             case RenderMode::kDepth: {
-                // double color = intersection.GetDistance();
-                // max_distance = std::max(max_distance, color);
-                // max_color = 1;
-                // // max_color = 1 / max_distance;
-                // return {color, color, color};
                 if (intersection) {
                     double color = intersection->GetDistance();
                     max_distance = std::max(max_distance, color);
