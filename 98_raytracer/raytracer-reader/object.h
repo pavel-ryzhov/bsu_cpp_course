@@ -55,3 +55,15 @@ struct SphereObject {
     const Material* material_ = nullptr;
     Sphere sphere_;
 };
+
+template<class T, class... U>
+concept any_of = std::disjunction_v<std::is_same<T, U>...>;
+
+template<class T>
+concept triangle = any_of<T, TriangleObject, Triangle>;
+
+template<class T>
+concept sphere = any_of<T, SphereObject, Sphere>;
+
+template<class T>
+concept object = triangle<T> || sphere<T>;

@@ -9,12 +9,10 @@
 
 #include <algorithm>
 #include <cmath>
-#include <concepts>
 #include <cstdlib>
 #include <optional>
 
-template<class T>
-requires std::same_as<T, Sphere> || std::same_as<T, SphereObject>
+template<sphere T>
 std::optional<Intersection> GetIntersection(const Ray& ray, const T& sph) {
     const Sphere sphere = [&sph] {
         if constexpr (std::is_same_v<T, SphereObject>) {
@@ -22,7 +20,7 @@ std::optional<Intersection> GetIntersection(const Ray& ray, const T& sph) {
         } else {
             return sph;
         }
-    }();
+    }(); 
     const Vector r = ray.GetOrigin() - sphere.GetCenter();
     const double a = std::pow(ray.GetDirection().Length(), 2);
     const double b = 2 * DotProduct(ray.GetDirection(), r);
@@ -80,8 +78,7 @@ inline Vector GetInterpolatedNormal(const TriangleObject& triangle, const Vector
     return baricentric_coords[0] * *triangle.GetNormal<0>() + baricentric_coords[1] * *triangle.GetNormal<1>() + baricentric_coords[2] * *triangle.GetNormal<2>();
 }
 
-template<class T>
-requires std::same_as<T, Triangle> || std::same_as<T, TriangleObject>
+template<triangle T>
 std::optional<Intersection> GetIntersection(const Ray& ray, const T& tr) {
     const Triangle triangle = [&tr] {
         if constexpr (std::is_same_v<T, TriangleObject>) {

@@ -14,7 +14,6 @@
 #include <array>
 #include <catch2/catch_test_macros.hpp>
 #include <cmath>
-#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -22,7 +21,7 @@
 #include <optional>
 #include <vector>
 
-static std::array<Vector, 3> CalculateBasis(Vector new_k) {
+inline std::array<Vector, 3> CalculateBasis(Vector new_k) {
     new_k.Normalize();
     auto new_i = CrossProduct({0, 1, 0}, new_k);
     auto new_j = CrossProduct(new_k, new_i);
@@ -32,13 +31,10 @@ static std::array<Vector, 3> CalculateBasis(Vector new_k) {
     }
     new_i.Normalize();
     new_j.Normalize();
-    std::cout << new_i << std::endl;
-    std::cout << new_j << std::endl;
-    std::cout << new_k << std::endl;
     return {new_i, new_j, new_k};
 }
 
-static Vector TranslateVector(
+inline Vector TranslateVector(
     const std::array<Vector, 3>& basis, const Vector& coords) {
     const auto x = DotProduct(coords, {basis[0][0], basis[1][0], basis[2][0]});
     const auto y = DotProduct(coords, {basis[0][1], basis[1][1], basis[2][1]});
@@ -46,18 +42,17 @@ static Vector TranslateVector(
     return {x, y, z};
 }
 
-static Vector TranslatePoint(
+inline Vector TranslatePoint(
     const std::array<Vector, 3>& basis, const Vector& r0, const Vector& coords) {
     return TranslateVector(basis, coords) + r0;
 }
 
-static Ray TranslateRay(const std::array<Vector, 3>& basis, const Vector& r0, const Ray& ray) {
+inline Ray TranslateRay(const std::array<Vector, 3>& basis, const Vector& r0, const Ray& ray) {
     return {
       TranslatePoint(basis, r0, ray.GetOrigin()), TranslateVector(basis, ray.GetDirection())};
 }
 
-template <class T>
-requires std::same_as<T, TriangleObject> || std::same_as<T, SphereObject>
+template <object T>
 void FindNearestIntersection(
     std::optional<Intersection>& nearest_intersection, const std::vector<T> objects, const Ray& ray) {
     for (const auto& object : objects) {      
@@ -65,6 +60,13 @@ void FindNearestIntersection(
             nearest_intersection = intersection;
         }
     }
+}
+
+inline std::optional<Intersection> FindIntersection(const Scene& scene,  const Ray& ray) {
+    std::optional<Intersection> intersection;
+    FindNearestIntersection(intersection, scene.GetSphereObjects(), ray);
+    FindNearestIntersection(intersection, scene.GetObjects(), ray);
+    return intersection;
 }
 
 inline Image Render(
@@ -108,29 +110,7 @@ inline Image Render(
               {0, 0, 0},
               {-width / 2 + pixel_size * (static_cast<double>(x_n) + .5), -height / 2 + pixel_size * (static_cast<double>(y_n) + .5), -1}};
             const Ray translated_ray = TranslateRay(basis, camera_options.look_from, ray);
-            std::optional<Intersection> nearest_intersection;
-            FindNearestIntersection(nearest_intersection, scene.GetSphereObjects(), translated_ray);
-            FindNearestIntersection(nearest_intersection, scene.GetObjects(), translated_ray);
-            // if (nearest_intersection) {
-            //     pixel_colors[y_n][x_n] = get_color(*nearest_intersection);
-            // } else {
-            //     pixel_colors[y_n][x_n] = {-1, -1, -1};
-            // }
-            pixel_colors[camera_options.screen_height - 1 - y_n][x_n] = get_color(nearest_intersection);
-            // if (x_n == 319 && y_n == 290) {
-            if (x_n == 249 && y_n == 249) {
-                // const Vector v1{-width / 2 + pixel_size * (static_cast<double>(0) + .5), -height / 2 + pixel_size * (static_cast<double>(y_n) + .5), -1};
-                // const Vector v2{-width / 2 + pixel_size * (static_cast<double>(499) + .5), -height / 2 + pixel_size * (static_cast<double>(y_n) + .5), -1};
-                // std::cout << "===?===\n" << TranslateCoords(basis, camera_options.look_from, v1) << std::endl;
-                // std::cout << TranslateCoords(basis, camera_options.look_from, v2) << std::endl;
-                // std::cout << GetIntersection(translated_ray, scene.GetObjects()[0].GetInner()).has_value();
-                // std::cout << scene.GetObjects()[0].GetInner() << std::endl;
-                // std::cout << basis[0] << " " << basis[1] << " " << basis[2] << std::endl;
-                // std::cout << "ffff" << translated_ray << std::endl;
-                // std::cout << CrossProduct(translated_ray.GetDirection(), basis[0]) << std::endl;
-                // std::cout << translated_ray << std::endl;
-                // FAIL("YYYYY");
-            }
+            pixel_colors[camera_options.screen_height - 1 - y_n][x_n] = get_color(FindIntersection(scene, translated_ray));
         }
     }
     if (render_options.mode == RenderMode::kDepth) {
@@ -154,11 +134,7 @@ inline Image Render(
     };
     for (int y_n = 0; y_n < camera_options.screen_height; ++y_n) {
         for (int x_n = 0; x_n < camera_options.screen_width; ++x_n) {
-            const auto in = pixel_colors[y_n][x_n]; //TODO()
-            // const auto in = pixel_colors[y_n][x_n] * (1 / max_distance); //TODO()
-            if (in[0] > 1) {
-                FAIL("FAIL");
-            }
+            const auto in = pixel_colors[y_n][x_n];
             image.SetPixel({
                 process_color(in[0]),
                 process_color(in[1]),
