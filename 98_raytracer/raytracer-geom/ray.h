@@ -4,12 +4,23 @@
 
 class Ray {
    public:
-    Ray(const Vector& origin, const Vector& direction);
+    Ray(const Vector& origin, const Vector& direction) : origin_(origin), direction_(direction) {
+        direction_.Normalize();
+    }
 
-    [[nodiscard]] const Vector& GetOrigin() const;
+    [[nodiscard]] const Vector& GetOrigin() const {
+        return origin_;
+    }
 
-    [[nodiscard]] const Vector& GetDirection() const;
+    [[nodiscard]] const Vector& GetDirection() const {
+        return direction_;
+    }
 
    private:
-    // data
+    Vector origin_;
+    Vector direction_;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Ray& v) {
+    return os << "Ray{" << v.GetOrigin() << ", " << v.GetDirection() << "}";
+}

@@ -2,18 +2,27 @@
 
 #include "vector.h"
 
+#include <array>
 #include <cassert>
 #include <cmath>
-#include <cstdint>
+#include <cstdlib>
 
 class Triangle {
    public:
-    Triangle(const Vector& a, const Vector& b, const Vector& c);
+    Triangle(const Vector& a, const Vector& b, const Vector& c) : data_{a, b, c} {}
 
-    const Vector& operator[](size_t ind) const;
+    const Vector& operator[](size_t ind) const {
+        return data_.at(ind);
+    }
 
-    [[nodiscard]] double Area() const;
+    [[nodiscard]] double Area() const {
+        return std::abs(.5 * CrossProduct(data_[0] - data_[1], data_[0] - data_[2]).Length());
+    }
 
    private:
-    // data
+    std::array<Vector, 3> data_;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Triangle& v) {
+    return os << "Triangle{" << v[0] << ", " << v[1] << ", " << v[2] << "}";
+}

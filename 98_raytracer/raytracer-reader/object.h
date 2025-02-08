@@ -5,12 +5,19 @@
 #include "98_raytracer/raytracer-geom/vector.h"
 #include "98_raytracer/raytracer-reader/material.h"
 
-#include <utility>
-#include <vector>
+#include <array>
+#include <cstddef>
+#include <optional>
 
 struct TriangleObject {
+
+    TriangleObject(const Material* material, const Triangle& triangle, std::optional<const std::array<Vector, 3>>& normals) : material_(material), polygon_(triangle), normals_(normals) {}
+
+
     template <size_t Ind>
-    [[nodiscard]] const Vector* GetNormal() const;
+    [[nodiscard]] const Vector* GetNormal() const {
+        return normals_ ? &(*normals_)[Ind] : nullptr;
+    }
 
     [[nodiscard]] const auto& GetInner() const noexcept {
         return polygon_;
@@ -20,13 +27,22 @@ struct TriangleObject {
         return material_;
     }
 
+    [[nodiscard]] bool HasNormals() const {
+        return normals_.has_value();
+    }
+
    private:
     const Material* material_ = nullptr;
     Triangle polygon_;
-    // data
+    std::optional<std::array<Vector, 3>> normals_;
 };
 
+
 struct SphereObject {
+    SphereObject(const Material* material, const Vector& center, double r)
+        : material_(material), sphere_(center, r) {
+    }
+
     [[nodiscard]] const auto& GetInner() const noexcept {
         return sphere_;
     }
