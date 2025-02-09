@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <iostream>
 #include <ostream>
+#include <variant>
 
 
 constexpr double kEpsilon = 1e-9;
@@ -15,6 +16,20 @@ class Vector {
     Vector() = default;
 
     Vector(double x, double y, double z) : data_{x, y, z} {
+    }
+
+    Vector(double x, double y, double z, std::monostate /*monostate_for_normolized*/) : Vector{x, y, z} {
+        Normalize();
+    }
+
+    Vector(const Vector& other, std::monostate /*monostate_for_normolized*/) : Vector(other) {
+        Normalize();
+    }
+
+    [[nodiscard]] Vector Normalized() const {
+        Vector tmp = *this;
+        tmp.Normalize();
+        return tmp;
     }
 
     double& operator[](size_t ind) {
@@ -31,6 +46,14 @@ class Vector {
 
     [[nodiscard]] Vector operator*(double a) const {
         return {data_[0] * a, data_[1] * a, data_[2] * a};
+    }
+
+    Vector& operator+=(const Vector& v) {
+        return *this = *this + v;
+    }
+
+    Vector& operator-=(const Vector& v) {
+        return *this = *this - v;
     }
 
     Vector& operator*=(double a) {

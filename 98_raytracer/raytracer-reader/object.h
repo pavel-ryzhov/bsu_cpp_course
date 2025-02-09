@@ -67,3 +67,6 @@ concept sphere = any_of<T, SphereObject, Sphere>;
 
 template<class T>
 concept object = triangle<T> || sphere<T>;
+
+template<class T>
+concept material_object = any_of<T, SphereObject, TriangleObject>;

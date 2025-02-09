@@ -11,6 +11,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <optional>
+#include <variant>
 
 template<sphere T>
 std::optional<Intersection> GetIntersection(const Ray& ray, const T& sph) {
@@ -48,7 +49,7 @@ std::optional<Intersection> GetIntersection(const Ray& ray, const T& sph) {
         normal *= -1;
     }
     normal.Normalize();
-    return Intersection{position, normal, (position - ray.GetOrigin()).Length()};
+    return Intersection{position, normal, (position - ray.GetOrigin()).Length(), is_inside};
 }
 
 inline Vector Reflect(const Vector& ray, const Vector& normal) {
@@ -75,7 +76,7 @@ inline Vector GetBarycentricCoords(const Triangle& triangle, const Vector& point
 
 inline Vector GetInterpolatedNormal(const TriangleObject& triangle, const Vector& position) {
     const auto baricentric_coords = GetBarycentricCoords(triangle.GetInner(), position);
-    return baricentric_coords[0] * *triangle.GetNormal<0>() + baricentric_coords[1] * *triangle.GetNormal<1>() + baricentric_coords[2] * *triangle.GetNormal<2>();
+    return {baricentric_coords[0] * *triangle.GetNormal<0>() + baricentric_coords[1] * *triangle.GetNormal<1>() + baricentric_coords[2] * *triangle.GetNormal<2>(), std::monostate()};
 }
 
 template<triangle T>
