@@ -138,28 +138,26 @@ inline Image Render(
     std::vector<std::vector<Vector>> pixel_colors(camera_options.screen_height, std::vector<Vector>(camera_options.screen_width, Vector{}));
     double max_distance = 0;
     double max_color = 0;
-    auto get_color = [&max_distance, &max_color, &render_options](const std::optional<std::pair<Intersection, const Material*>>& intersection) -> Vector {
+    auto get_color = [&max_distance, &max_color, &render_options, &scene](const std::optional<std::pair<Intersection, const Material*>>& intersection, const Ray& ray) -> Vector {
+        if (intersection) {
         switch (render_options.mode) {
             case RenderMode::kDepth: {
-                if (intersection) {
-                    double color = intersection->first.GetDistance();
-                    max_distance = std::max(max_distance, color);
-                    return {color, color, color};
-                }
-                max_color = 1;
-                return {-1, -1, -1};
+                double color = intersection->first.GetDistance();
+                max_distance = std::max(max_distance, color);
+                return {color, color, color};
             }
             case RenderMode::kNormal: {
-                if (intersection) {
-                    const auto result = .5 * intersection->first.GetNormal() + Vector{.5, .5, .5};
-                    max_color = std::max({max_color, result[0], result[1], result[2]});
-                    return result;
-                }
-                return {0, 0, 0};
+                const auto result = .5 * intersection->first.GetNormal() + Vector{.5, .5, .5};
+                max_color = std::max({max_color, result[0], result[1], result[2]});
+                return result;
             }
             case RenderMode::kFull: {
-                return {};
+                return GetIntensity(scene, intersection->first, intersection->second, ray, render_options.depth);
             }
+        }
+        } else {
+            max_color = 1;
+            return render_options.mode == RenderMode::kDepth ? Vector{-1, -1, -1} : Vector{0, 0, 0};
         }
     };
     for (size_t y_n = 0; y_n < camera_options.screen_height; ++y_n) {
@@ -168,7 +166,7 @@ inline Image Render(
               {0, 0, 0},
               {-width / 2 + pixel_size * (static_cast<double>(x_n) + .5), -height / 2 + pixel_size * (static_cast<double>(y_n) + .5), -1}};
             const Ray translated_ray = TranslateRay(basis, camera_options.look_from, ray);
-            pixel_colors[camera_options.screen_height - 1 - y_n][x_n] = get_color(FindNearestIntersection(scene, translated_ray));
+            pixel_colors[camera_options.screen_height - 1 - y_n][x_n] = get_color(FindNearestIntersection(scene, translated_ray), translated_ray);
         }
     }
     if (render_options.mode == RenderMode::kDepth) {
