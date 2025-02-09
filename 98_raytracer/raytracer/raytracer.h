@@ -22,6 +22,8 @@
 #include <utility>
 #include <vector>
 
+constexpr auto kLargeEpsilon = 1e-5;
+
 inline std::array<Vector, 3> CalculateBasis(Vector new_k) {
     new_k.Normalize();
     auto new_i = CrossProduct({0, 1, 0}, new_k);
@@ -71,14 +73,15 @@ inline std::optional<std::pair<Intersection, const Material*>> FindNearestInters
 }
 
 template<object T>
-bool IsIntersecting(const std::vector<T>& objects, const Ray& ray) {
-    return std::ranges::any_of(objects, [&ray](const T& object) {
-        return GetIntersection(ray, object).has_value();
+bool IsIntersecting(const std::vector<T>& objects, const Ray& ray, const Vector& ray_end) {
+    return std::ranges::any_of(objects, [&ray, &ray_end](const T& object) {
+        const auto intersection = GetIntersection(ray, object);
+        return intersection && DotProduct(ray.GetDirection(), ray_end - intersection->GetPosition()) > kEpsilon;
     });
 }
 
-inline bool IsIntersecting(const Scene& scene, const Ray& ray) {
-    return IsIntersecting(scene.GetSphereObjects(), ray) || IsIntersecting(scene.GetObjects(), ray);
+inline bool IsIntersecting(const Scene& scene, const Ray& ray, const Vector& ray_end) {
+    return IsIntersecting(scene.GetSphereObjects(), ray, ray_end) || IsIntersecting(scene.GetObjects(), ray, ray_end);
 }
 
 inline Vector GetIntensity(const Scene& scene, const Intersection& intersection, const Material* material, const Ray& ray, int depth) {
@@ -86,22 +89,22 @@ inline Vector GetIntensity(const Scene& scene, const Intersection& intersection,
     for (const auto& light : scene.GetLights()) {
         auto to_light = light.position - intersection.GetPosition();
         to_light.Normalize();
-        const Ray to_light_ray{kEpsilon * to_light + intersection.GetPosition(), to_light};
-        if (!IsIntersecting(scene, to_light_ray)) {
-            const auto i_d = DotProduct(material->diffuse_color, light.intensity) * std::max(0., DotProduct(intersection.GetNormal(), to_light));
+        const Ray to_light_ray{kLargeEpsilon * to_light + intersection.GetPosition(), to_light};
+        if (!IsIntersecting(scene, to_light_ray, light.position)) {
+            const auto i_d = HadamardProduct(material->diffuse_color, light.intensity) * std::max(0., DotProduct(intersection.GetNormal(), to_light));
             auto from_light_reflected = Reflect(-to_light, intersection.GetNormal());
             from_light_reflected.Normalize();
-            const auto i_s = std::pow(DotProduct(material->specular_color, light.intensity) * std::max(0., DotProduct(from_light_reflected, -ray.GetDirection())), material->specular_exponent);
-            sum += material->diffuse_color * i_d + material->specular_color * i_s;
+            const auto i_s = HadamardProduct(material->specular_color, light.intensity) * std::pow(std::max(0., DotProduct(from_light_reflected, -ray.GetDirection())), material->specular_exponent);
+            sum += i_d + i_s;
         }
     }
     sum *= material->albedo[0];
     sum += material->ambient_color + material->intensity;
     if (depth > 0) {
-        if (!intersection.IsInside() && material->albedo[1] > 0) {
+        if (!intersection.IsInside() && material->albedo[1] > kEpsilon) {
             auto reflected = Reflect(ray.GetDirection(), intersection.GetNormal());
             reflected.Normalize();
-            const Ray ray_reflected{kEpsilon * reflected + intersection.GetPosition(), reflected};
+            const Ray ray_reflected{kLargeEpsilon * reflected + intersection.GetPosition(), reflected};
             const auto intersection_reflected_opt = FindNearestIntersection(scene, ray_reflected);
             if (intersection_reflected_opt) {
                 const auto [intersection_reflected, material_reflected] = *intersection_reflected_opt;
@@ -109,17 +112,17 @@ inline Vector GetIntensity(const Scene& scene, const Intersection& intersection,
                 sum += intensity_reflected * material->albedo[1];
             }
         }
-        if (material->albedo[2] > 0) {
-            const auto refracted_opt = Refract(ray.GetDirection(), intersection.GetNormal(), material->refraction_index);
+        if (material->albedo[2] > kEpsilon) {
+            const auto refracted_opt = Refract(ray.GetDirection(), intersection.GetNormal(), !intersection.IsInside() ? 1 / material->refraction_index : material->refraction_index);
             if (refracted_opt) {
                 auto refracted = *refracted_opt;
                 refracted.Normalize();
-                const Ray ray_refracted{kEpsilon * refracted + intersection.GetPosition(), refracted};
+                const Ray ray_refracted{kLargeEpsilon * refracted + intersection.GetPosition(), refracted};
                 const auto intersection_refracted_opt = FindNearestIntersection(scene, ray_refracted);
                 if (intersection_refracted_opt) {
                     const auto [intersection_refracted, material_refracted] = *intersection_refracted_opt;
                     auto intensity_refracted = GetIntensity(scene, intersection_refracted, material_refracted, ray_refracted, depth - 1);
-                    sum += intensity_refracted * material->albedo[2];
+                    sum += intensity_refracted * (intersection.IsInside() ? 1. : material->albedo[2]);
                 }
             }
         }
@@ -136,28 +139,26 @@ inline Image Render(
     const auto pixel_size = width / camera_options.screen_width;
     const auto basis = CalculateBasis(camera_options.look_from - camera_options.look_to);
     std::vector<std::vector<Vector>> pixel_colors(camera_options.screen_height, std::vector<Vector>(camera_options.screen_width, Vector{}));
-    double max_distance = 0;
     double max_color = 0;
-    auto get_color = [&max_distance, &max_color, &render_options, &scene](const std::optional<std::pair<Intersection, const Material*>>& intersection, const Ray& ray) -> Vector {
+    auto get_color = [&max_color, &render_options, &scene](const std::optional<std::pair<Intersection, const Material*>>& intersection, const Ray& ray) -> Vector {
         if (intersection) {
         switch (render_options.mode) {
             case RenderMode::kDepth: {
                 double color = intersection->first.GetDistance();
-                max_distance = std::max(max_distance, color);
+                max_color = std::max(max_color, color);
                 return {color, color, color};
             }
             case RenderMode::kNormal: {
-                const auto result = .5 * intersection->first.GetNormal() + Vector{.5, .5, .5};
-                max_color = std::max({max_color, result[0], result[1], result[2]});
-                return result;
+                return  .5 * intersection->first.GetNormal() + Vector{.5, .5, .5};
             }
             case RenderMode::kFull: {
-                return GetIntensity(scene, intersection->first, intersection->second, ray, render_options.depth);
+                const auto color = GetIntensity(scene, intersection->first, intersection->second, ray, render_options.depth);
+                max_color = std::max({max_color, color[0], color[1], color[2]});
+                return color;
             }
         }
         } else {
-            max_color = 1;
-            return render_options.mode == RenderMode::kDepth ? Vector{-1, -1, -1} : Vector{0, 0, 0};
+            return render_options.mode == RenderMode::kDepth ? Vector{-1, -1, -1} : Vector{};
         }
     };
     for (size_t y_n = 0; y_n < camera_options.screen_height; ++y_n) {
@@ -175,8 +176,7 @@ inline Image Render(
                 if (std::abs(pixel_colors[y_n][x_n][0] + 1) < kEpsilon) {
                     pixel_colors[y_n][x_n] *= -1;
                 } else {
-                    pixel_colors[y_n][x_n] *= (1 / max_distance);
-                    max_color = std::max(max_color, pixel_colors[y_n][x_n][0]);
+                    pixel_colors[y_n][x_n] *= (1 / max_color);
                 }
             }
         }

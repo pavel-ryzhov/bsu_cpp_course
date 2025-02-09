@@ -108,10 +108,16 @@ inline std::unordered_map<std::string, Material> ReadMaterials(const std::filesy
     std::string command;
     while (ifs.good()) {
         ifs >> command;
+        if (command.starts_with('#')) {
+            std::getline(ifs, command);
+            continue;
+        }
         if (commands.contains(command)) {
             commands.at(command)();
+            command = "";
         }
     }
+    
     materials.emplace(current_material.name, current_material);
     return materials;
 }
@@ -196,8 +202,13 @@ inline Scene ReadScene(const std::filesystem::path& path) {
     std::string command;
     while (ifs.good()) {
         ifs >> command;
+        if (command.starts_with('#')) {
+            std::getline(ifs, command);
+            continue;
+        }
         if (commands.contains(command)) {
             commands.at(command)();
+            command = "";
         }
     }
     return scene;
