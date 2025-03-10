@@ -16,7 +16,7 @@ void Check(const Deque& actual, const std::vector<int>& expected) {
     REQUIRE(actual.Size() == expected.size());
     for (auto i : std::views::iota(size_t{0}, expected.size())) {
         if (actual[i] != expected[i]) {
-            FAIL(actual[i] << " != " << expected[i]);
+            FAIL(i << "   " << actual[i] << " != " << expected[i]);
         }
     }
 }

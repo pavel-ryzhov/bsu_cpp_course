@@ -10,6 +10,8 @@
 // NOLINTNEXTLINE(cert-err58-cpp,fuchsia-statically-constructed-objects)
 static const auto kTestsDir = GetFileDir(__FILE__, true) / "tests";
 
+constexpr auto kOutputPath = "/home/amigo/programming/projects/studing/pavelryzhov0639289/98_raytracer/raytracer-debug/out.png";
+
 TEST_CASE("Classic box") {
     RenderOptions render_opts{4, RenderMode::kDepth};
     const auto test_dir = kTestsDir / "classic_box";

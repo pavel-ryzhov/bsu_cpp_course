@@ -9,7 +9,7 @@ class ReverseUnaryFunctor {
     explicit ReverseUnaryFunctor(Functor functor) : functor_(functor) {
     }
 
-    bool operator()(auto arg) {
+    bool operator()(auto& arg) {
         return !functor_(arg);
     }
 
@@ -23,7 +23,7 @@ class ReverseBinaryFunctor {
     explicit ReverseBinaryFunctor(Functor functor) : functor_(functor) {
     }
 
-    bool operator()(auto arg1, auto arg2) {
+    bool operator()(auto& arg1, auto& arg2) {
         return !functor_(arg1, arg2);
     }
 

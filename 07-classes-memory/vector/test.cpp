@@ -69,8 +69,38 @@ TEST_CASE("Modifications with []") {
     Check(a, {1, 2, 3});
 }
 
+//  // template<typename _Iter>
+//     // concept random_access_iterator = bidirectional_iterator<_Iter>
+//     //   && derived_from<__detail::__iter_concept<_Iter>,
+//     //                   random_access_iterator_tag>
+//     //   && totally_ordered<_Iter> && sized_sentinel_for<_Iter, _Iter>
+//     //   && requires(_Iter __i, const _Iter __j,
+//     //               const iter_difference_t<_Iter> __n)
+//     //   {
+//     //     { __i += __n } -> same_as<_Iter&>;
+//     //     { __j +  __n } -> same_as<_Iter>;
+//     //     { __n +  __j } -> same_as<_Iter>;
+//     //     { __i -= __n } -> same_as<_Iter&>;
+//     //     { __j -  __n } -> same_as<_Iter>;
+//     //     {  __j[__n]  } -> same_as<iter_reference_t<_Iter>>;
+//     //   };
+//
+//
 TEST_CASE("Vector iterators 1") {
+    using _Iter = Vector::Iterator;
     STATIC_CHECK(std::random_access_iterator<Vector::Iterator>);
+    STATIC_CHECK(
+        std::bidirectional_iterator<_Iter> &&
+        std::derived_from<std::__detail::__iter_concept<_Iter>, std::random_access_iterator_tag> &&
+        std::totally_ordered<_Iter> && std::sized_sentinel_for<_Iter, _Iter> &&
+        requires(_Iter __i, const _Iter __j, const std::iter_difference_t<_Iter> __n) {
+            { __i += __n } -> std::same_as<_Iter&>;
+            { __j + __n } -> std::same_as<_Iter>;
+            { __n + __j } -> std::same_as<_Iter>;
+            { __i -= __n } -> std::same_as<_Iter&>;
+            { __j - __n } -> std::same_as<_Iter>;
+            { __j[__n] } -> std::same_as<std::iter_reference_t<_Iter>>;
+        });
 
     Vector a = {0, 1, 2, 3, 4};
     auto first = a.begin();

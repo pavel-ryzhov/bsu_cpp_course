@@ -11,12 +11,15 @@
 // NOLINTNEXTLINE(fuchsia-statically-constructed-objects,cert-err58-cpp)
 static const auto kTestsDir = GetFileDir(__FILE__, true) / "tests";
 
+constexpr auto kOutputPath = "/home/amigo/programming/projects/studing/pavelryzhov0639289/98_raytracer/raytracer-debug/out.png";
+
 TEST_CASE("Shading parts") {
     const CameraOptions camera_opts{640, 480};
     RenderOptions render_opts{1, RenderMode::kDepth};
     const auto test_dir = kTestsDir / "shading_parts";
 
     CheckImage(test_dir, "scene.obj", "depth.png", camera_opts, render_opts);
+
     render_opts.mode = RenderMode::kNormal;
     CheckImage(test_dir, "scene.obj", "normal.png", camera_opts, render_opts);
 }

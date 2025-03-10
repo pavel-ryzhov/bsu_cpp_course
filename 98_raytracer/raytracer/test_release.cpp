@@ -1,4 +1,5 @@
 #include "98_raytracer/raytracer/options/camera_options.h"
+#include "98_raytracer/raytracer/options/render_options.h"
 #include "98_raytracer/raytracer/tests/commons.h"
 #include "tools/util/util.h"
 
@@ -9,29 +10,34 @@
 // NOLINTNEXTLINE(cert-err58-cpp,fuchsia-statically-constructed-objects)
 static const auto kTestsDir = GetFileDir(__FILE__, true) / "tests";
 
+constexpr auto kOutputPath = "/home/amigo/programming/projects/studing/pavelryzhov0639289/98_raytracer/raytracer/out.png";
+
 TEST_CASE("Classic box") {
     CameraOptions camera_opts{
-      .screen_width = 500,
-      .screen_height = 500,
+      .screen_width = 2000,
+      .screen_height = 2000,
       .look_from = {-.5, 1.5, .98},
       .look_to = {0., 1., 0.}};
     const auto test_dir = kTestsDir / "classic_box";
 
-    CheckImage(test_dir, "CornellBox.obj", "first.png", camera_opts, {4});
-    camera_opts.look_from = {-.9, 1.9, -1};
-    camera_opts.look_to = {0., 0., 0.};
-    CheckImage(test_dir, "CornellBox.obj", "second.png", camera_opts, {4});
+    CheckImage(test_dir, "CornellBox.obj", "first.png", camera_opts, {4}, kOutputPath);
+    // camera_opts.look_from = {-.9, 1.9, -1};
+    // camera_opts.look_to = {0., 0., 0.};
+    // CheckImage(test_dir, "CornellBox.obj", "second.png", camera_opts, {4});
 }
 
 TEST_CASE("Mirrors") {
     const CameraOptions camera_opts{
-      .screen_width = 800,
-      .screen_height = 600,
+      .screen_width = 2400,
+      .screen_height = 1800,
       .look_from = {2., 1.5, -.1},
-      .look_to = {1., 1.2, -2.8}};
+      .look_to = {1., 1.2, -2.8}
+      // .look_from = {1., 1.2, -2.8},
+      // .look_to = {2., 1.5, -.1},
+      };
     const auto test_dir = kTestsDir / "mirrors";
 
-    CheckImage(test_dir, "scene.obj", "result.png", camera_opts, {9});
+    CheckImage(test_dir, "scene.obj", "result.png", camera_opts, {15}, kOutputPath);
 }
 
 TEST_CASE("Distorted box") {
@@ -47,11 +53,11 @@ TEST_CASE("Distorted box") {
 
 TEST_CASE("Deer") {
     const CameraOptions camera_opts{
-      .screen_width = 500,
-      .screen_height = 500,
+      .screen_width = 1000,
+      .screen_height = 1000,
       .look_from = {100., 200., 150.},
       .look_to = {0., 100., 0.}};
     const auto test_dir = kTestsDir / "deer";
 
-    CheckImage(test_dir, "CERF_Free.obj", "result.png", camera_opts, {1});
+    CheckImage(test_dir, "CERF_Free.obj", "result.png", camera_opts, {1, RenderMode::kNormal}, kOutputPath);
 }

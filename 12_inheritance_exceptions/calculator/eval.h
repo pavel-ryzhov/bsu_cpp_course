@@ -11,4 +11,5 @@ inline int64_t EvaluateExpression(const std::string& expression) {
     Tokenizer tokenizer{&ss};
     auto expr = ParseExpression(&tokenizer);
     return expr->Evaluate();
+    // return 0;
 }

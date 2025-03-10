@@ -23,6 +23,7 @@ inline std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
     return os;
 }
 
+//
 TEST_CASE("Constructor") {
     const IMatrix a(2, 3);
     const IMatrix b(2, 3, 1);
@@ -40,6 +41,7 @@ TEST_CASE("Constructor") {
     CHECK_THROWS_AS(IMatrix(IVector{}), std::exception);
 }
 
+//
 TEST_CASE("Copy constructor") {
     IMatrix a(1, 2);
     const IMatrix b(a);
@@ -51,6 +53,7 @@ TEST_CASE("Copy constructor") {
     CHECK(c.Data() == IVector{{0, 0}});
 }
 
+//
 TEST_CASE("Accessors") {
     {
         IMatrix a(IVector{{1, 2}});
@@ -73,6 +76,7 @@ TEST_CASE("Accessors") {
     }
 }
 
+//
 TEST_CASE("Constness") {
     {
         const IMatrix a({{1, 2}, {3, 4}});
@@ -90,12 +94,14 @@ TEST_CASE("Constness") {
     }
 }
 
+//
 TEST_CASE("Transpose") {
     const IMatrix a({{0, 1}, {2, 3}, {4, 5}});
     CHECK(a.Transpose().Data() == IVector{{0, 2, 4}, {1, 3, 5}});
     CHECK(Transpose(a).Data() == a.Transpose().Data());
 }
 
+//
 TEST_CASE("Operators") {
     using FMatrix = Matrix<double>;
 
@@ -114,6 +120,7 @@ TEST_CASE("Operators") {
     CHECK((b * c) == FMatrix({{1.0, 1.0}, {2.0, -2.0}}));
 }
 
+//
 TEST_CASE("Big") {
     const auto a = IMatrix::Identity(300);
     CHECK(a * a == a);

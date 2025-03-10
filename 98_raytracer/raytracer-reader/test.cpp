@@ -1,4 +1,5 @@
 #include "98_raytracer/raytracer-geom/vector.h"
+#include "98_raytracer/raytracer-reader/material.h"
 #include "98_raytracer/raytracer-reader/scene.h"
 #include "tools/util/util.h"
 
@@ -20,6 +21,15 @@ void Check(const Vector& vector, double x) {
     Check(vector, x, x, x);
 }
 
+TEST_CASE("Material") {
+    const auto scene = ReadScene("/home/amigo/programming/projects/studing/pavelryzhov0639289/98_raytracer/raytracer/tests/deer/CERF_Free.obj");
+    REQUIRE(scene.GetMaterials().contains("wire_086086086"));
+    const Material mat = scene.GetMaterials().begin()->second;
+    Check(mat.ambient_color, 0.3373, 0.3373, 0.3373);
+    Check(mat.diffuse_color, 0.3373, 0.3373, 0.3373);
+    Check(mat.specular_color, 0.3500, 0.3500, 0.3500);
+}
+
 TEST_CASE("Scene") {  // NOLINT
     const auto test_dir = (GetFileDir(__FILE__, true) / "tests");
     const auto scene = ReadScene(test_dir / "cube.obj");
@@ -33,6 +43,7 @@ TEST_CASE("Scene") {  // NOLINT
 
     {
         const auto& obj = objects[0];
+        std::cout << obj.GetInner() << std::endl;
         Check(obj.GetInner()[0], 1., 0., -1.04);
         Check(obj.GetInner()[1], -.99, 0., -1.04);
         Check(obj.GetInner()[2], -1.01, 0., .99);

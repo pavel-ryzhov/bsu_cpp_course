@@ -142,7 +142,7 @@ int mySplintCube(
     int k;          /* Current midpoint in binary search. */
     double dx;      /* Change in x (xa[hi] - xa[lo]). */
     double a;       /* "upper" portion temp variable. */
-    double b;       /* "lower" portion temp variable. */
+    double b;       /* "lower" portion portiontemp variable. */
 
     if (n == 0) {
         return -1;
